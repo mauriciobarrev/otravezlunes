@@ -2,194 +2,191 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw; /* Ocupa todo el viewport */
-  height: 100vh; /* Ocupa todo el viewport */
-  background-color: rgba(0,0,0,0.9); /* Más oscuro y definido */
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.9);
   z-index: 1000;
-  overflow-y: auto; /* Scroll principal aquí */
-  padding-top: 60px; /* Espacio para contenido y botón de cierre fijo */
-  padding-bottom: 60px; /* Espacio al final del scroll */
-  box-sizing: border-box;
-  display: flex; /* Para centrar el gallery-modal-content horizontalmente */
-  flex-direction: column; /* Necesario para que el padding funcione con flex */
-  align-items: center; 
-}
-
-.gallery-modal-content {
-  background-color: #000; /* Fondo negro para el contenido del modal */
-  color: #fff;
-  width: 90%; /* Ancho relativo */
-  max-width: 1000px; /* Ancho máximo */
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  border-radius: 8px; /* Opcional: bordes redondeados como Unsplash */
-  z-index: 1010; /* Encima del backdrop */
-  margin-bottom: 60px; /* Espacio al final antes del padding del backdrop */
-}
-
-.modal-close-button {
-  position: fixed; /* Fijo al viewport */
-  top: 25px;
-  right: 25px;
-  background: rgba(10, 10, 10, 0.5); /* Sutil, como Unsplash */
-  border: none;
-  font-size: 2rem; /* Ajustar para una 'X' más fina */
-  color: #888;
-  cursor: pointer;
-  border-radius: none;
-  width: 36px; 
-  height: 36px; 
-  line-height: 36px; /* Centrar el texto/icono verticalmente */
-  text-align: center;
-  z-index: 1050; /* Muy alto */
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: background-color 0.2s ease;
+  overflow: hidden;
+  padding: 0;
+  box-sizing: border-box;
 }
+
+.gallery-modal-content {
+  background-color: #000;
+  color: #fff;
+  width: 90%;
+  max-width: 1200px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  z-index: 1010;
+  overflow: hidden;
+  position: relative;
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.4);
+  border: none;
+  font-size: 24px;
+  color: #fff;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+  z-index: 1050;
+}
+
 .modal-close-button:hover {
-  color: #ffffffbd;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
 }
 
 .gallery-image-container {
+  flex: 1;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%; 
-  padding: 20px; /* Padding para el marco alrededor de la foto */
-  box-sizing: border-box;
-  /* La altura se adaptará a la foto, que tiene max-height */
+  overflow: hidden;
+  background-color: #000;
+  width: 100%;
+  height: 80%;
 }
 
 .gallery-photo {
   max-width: 100%;
-  max-height: 80vh; /* Mantenemos para que la imagen no sea excesivamente alta inicialmente */
+  max-height: 100%;
   object-fit: contain;
-  display: block;
-  height: auto; 
+  width: auto;
+  height: auto;
+  transition: transform 0.3s ease;
 }
 
 .gallery-nav-button {
-  position: fixed;
+  position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: transparent;
-  color: #888;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: white;
   border: none;
-  font-size: 1.5rem;
-  padding: 90px;
+  font-size: 24px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
   cursor: pointer;
-  z-index: 1050;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 40px;
-  height: 40px;
-  transition: color 0.2s ease;
-}
-
-.gallery-nav-button.prev {
-  left: 0;
-  content: "\2190"; /* Flecha izquierda */
-}
-
-.gallery-nav-button.next {
-  right: 0;
-  content: "\2192"; /* Flecha derecha */
+  transition: background-color 0.3s;
+  z-index: 1020;
 }
 
 .gallery-nav-button:hover {
-  color: #ffffffbd;
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.gallery-nav-button.prev {
+  left: 20px;
+}
+
+.gallery-nav-button.next {
+  right: 20px;
 }
 
 .gallery-info {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 15px 20px;
   width: 100%;
-  background-color: #000; 
-  padding: 0 20px 20px 20px; /* Ajustar padding, especialmente arriba */
   box-sizing: border-box;
-  text-align: left;
-  /* No necesita max-height ni overflow-y propios */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  height: 20%;
+  overflow-y: auto;
 }
 
 .gallery-info h3 {
   margin-top: 0;
-  margin-bottom: 5px;
-  font-size: 1.2rem;
+  margin-bottom: 10px;
+  font-size: 1.4rem;
+  color: #fff;
 }
 
 .photo-caption {
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: #eee;
-  margin-bottom: 3px;
+  margin-bottom: 8px;
+  font-style: italic;
 }
 
 .photo-counter {
-  font-size: 0.8rem;
-  color: #bbb;
-  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-bottom: 10px;
+  font-weight: bold;
 }
 
 .lugar-description {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #ddd;
-  margin-bottom: 0;
+  line-height: 1.4;
+  margin-bottom: 10px;
 }
 
-/* Podríamos añadir una barra superior similar a la de la imagen de referencia */
-.gallery-top-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  padding: 10px 20px;
-  box-sizing: border-box;
+/* Responsive para pantallas más pequeñas */
+@media (max-width: 768px) {
+  .gallery-modal-content {
+    width: 95%;
+    height: 95vh;
+  }
+  
+  .gallery-nav-button {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+  
+  .gallery-info h3 {
+    font-size: 1.2rem;
+  }
+  
+  .photo-caption, .lugar-description {
+    font-size: 0.9rem;
+  }
+}
+
+.error-image {
   display: flex;
-  justify-content: space-between; /* Para alinear elementos a izq y der */
+  flex-direction: column;
   align-items: center;
-  z-index: 1001;
+  justify-content: center;
+  padding: 20px;
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  border-radius: 8px;
+  color: #f44336;
+  min-height: 150px;
+  text-align: center;
+  width: 100%;
 }
 
-.gallery-top-bar .photo-counter-top {
-  font-size: 0.9rem;
-  color: #ccc;
+.error-image p {
+  font-weight: bold;
+  margin: 0 0 10px 0;
 }
 
-/* Ejemplo de cómo podrías mover el contador arriba (requiere cambios en JSX también) 
-.gallery-info {
-  text-align: left; 
-  padding: 10px 20px;
+.error-image small {
+  font-size: 0.8em;
+  color: #777;
+  word-break: break-all;
+  max-width: 300px;
 }
-.photo-counter {
-  display: none; // Ocultar el contador de abajo si se mueve arriba 
-}
-*/
-
-.modal-body p {
-  font-size: 0.9rem;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-.modal-actions button {
-  background-color: #555;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  margin-right: 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.modal-actions button:hover {
-  background-color: #777;
-}
-
-.modal-actions button:last-child {
-  margin-right: 0;
-} 
