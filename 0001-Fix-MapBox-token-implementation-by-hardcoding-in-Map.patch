@@ -1,0 +1,26 @@
+From 6bb55504834be7daba38116362561118f34145fd Mon Sep 17 00:00:00 2001
+From: Mauricio Barrera <mauricio@le.mu>
+Date: Mon, 19 May 2025 21:11:41 -0400
+Subject: [PATCH] Fix: MapBox token implementation by hardcoding in Map.js
+
+---
+ frontend/src/components/Map.js | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/frontend/src/components/Map.js b/frontend/src/components/Map.js
+index 658f521..972e678 100644
+--- a/frontend/src/components/Map.js
++++ b/frontend/src/components/Map.js
+@@ -1,7 +1,8 @@
+ import React, { useRef, useEffect, useState } from 'react';
+ import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
+ 
+-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
++// Use the token directly - copy it from your .env file
++mapboxgl.accessToken = 'pk.eyJ1IjoibWF1cmljaW9iYXJyZXYiLCJhIjoiY21hdTl3bG53MTVpMjJxb3Njd2xoM2VuMiJ9.piVsma3PVk8ZcTcy4fLEng';
+ 
+ // Restructured data model focused on individual photos with their specific locations
+ const photosData = [
+-- 
+2.49.0
+
