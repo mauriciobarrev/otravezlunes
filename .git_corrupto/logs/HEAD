@@ -1,0 +1,25 @@
+0000000000000000000000000000000000000000 451f917f759bf057e3887e9900909e310bd2ae91 Mauricio Barrera <mauricio@le.mu> 1747668271 -0400	commit (initial): Initial commit: Add .gitignore
+451f917f759bf057e3887e9900909e310bd2ae91 451f917f759bf057e3887e9900909e310bd2ae91 Mauricio Barrera <mauricio@le.mu> 1747668277 -0400	checkout: moving from develop to main
+451f917f759bf057e3887e9900909e310bd2ae91 451f917f759bf057e3887e9900909e310bd2ae91 Mauricio Barrera <mauricio@le.mu> 1747668277 -0400	checkout: moving from main to develop
+451f917f759bf057e3887e9900909e310bd2ae91 b8b43c63bfcb46976f697787f34950f87170fbe9 Mauricio Barrera <mauricio@le.mu> 1747668741 -0400	commit: feat: Implement basic Mapbox map with markers and popups
+b8b43c63bfcb46976f697787f34950f87170fbe9 606e52abdcb266dfeb8d33d2ec721b2a38f30fd4 Mauricio Barrera <mauricio@le.mu> 1747670953 -0400	commit: feat: Configure Django backend with PostgreSQL, models, and admin
+606e52abdcb266dfeb8d33d2ec721b2a38f30fd4 9920193ba576f797929fe085f45201de74c54d75 Mauricio Barrera <mauricio@le.mu> 1747682063 -0400	commit: Finalizar ajustes de estilo y scroll del modal de galería
+9920193ba576f797929fe085f45201de74c54d75 0756c604999b8da8c8876b68d0344f6ab687447b Mauricio Barrera <mauricio@le.mu> 1747688811 -0400	commit: Implementado clustering de fotos en el mapa y corrección en galería para mostrar la foto seleccionada
+0756c604999b8da8c8876b68d0344f6ab687447b baa7f8850c0cc809842d78d24bb81f9559d75526 Mauricio Barrera <mauricio@le.mu> 1747689761 -0400	commit: feat: added random image photo icons to clusters
+baa7f8850c0cc809842d78d24bb81f9559d75526 a44abd32374739a1cd92adeaebbd965ea2e5e25a Mauricio Barrera <mauricio@le.mu> 1747700705 -0400	commit: backend v0.0.1 working correctly
+a44abd32374739a1cd92adeaebbd965ea2e5e25a a44abd32374739a1cd92adeaebbd965ea2e5e25a Mauricio Barrera <mauricio@le.mu> 1747700981 -0400	reset: moving to HEAD
+a44abd32374739a1cd92adeaebbd965ea2e5e25a a44abd32374739a1cd92adeaebbd965ea2e5e25a Mauricio Barrera <mauricio@le.mu> 1747700990 -0400	reset: moving to HEAD
+a44abd32374739a1cd92adeaebbd965ea2e5e25a a44abd32374739a1cd92adeaebbd965ea2e5e25a Mauricio Barrera <mauricio@le.mu> 1747700997 -0400	reset: moving to HEAD
+a44abd32374739a1cd92adeaebbd965ea2e5e25a 6755ecfb7bcf4c32bf1ea4cdff95ea8be1342acf Mauricio Barrera <mauricio@le.mu> 1747701019 -0400	commit: First backend version (v0.0.1)
+6755ecfb7bcf4c32bf1ea4cdff95ea8be1342acf 7fd09129f9896e034f3d7fb8c3b7e7d200efffa8 Mauricio Barrera <mauricio@le.mu> 1747701118 -0400	commit: Versión completa del proyecto v0.0.1 (backend completo)
+7fd09129f9896e034f3d7fb8c3b7e7d200efffa8 f507274a881487e6b2d3c7d0ca8443a5bc0bee1b Mauricio Barrera <mauricio@le.mu> 1747701246 -0400	commit: Versión completa del proyecto v0.0.1 (backend y frontend)
+f507274a881487e6b2d3c7d0ca8443a5bc0bee1b f507274a881487e6b2d3c7d0ca8443a5bc0bee1b Mauricio Barrera <mauricio@le.mu> 1747701569 -0400	checkout: moving from develop to proyecto_limpio
+f507274a881487e6b2d3c7d0ca8443a5bc0bee1b f507274a881487e6b2d3c7d0ca8443a5bc0bee1b Mauricio Barrera <mauricio@le.mu> 1747701651 -0400	reset: moving to HEAD
+f507274a881487e6b2d3c7d0ca8443a5bc0bee1b f507274a881487e6b2d3c7d0ca8443a5bc0bee1b Mauricio Barrera <mauricio@le.mu> 1747701892 -0400	reset: moving to HEAD
+f507274a881487e6b2d3c7d0ca8443a5bc0bee1b 98a892a8e0a62de3f64402a8db06b40574bdc337 Mauricio Barrera <mauricio@le.mu> 1747701953 -0400	commit: Estado completo del proyecto (backend funcional con modelos de lugares y fotos)
+98a892a8e0a62de3f64402a8db06b40574bdc337 b896f8899938d0207002bc65ac7c5572c0d57ef9 Mauricio Barrera <mauricio@le.mu> 1747702223 -0400	commit: frontend v0.0.1
+b896f8899938d0207002bc65ac7c5572c0d57ef9 60e7235ef3ef729194915bbb2927e66d21106438 Mauricio Barrera <mauricio@le.mu> 1747702279 -0400	commit: Eliminar directorios de backup innecesarios
+60e7235ef3ef729194915bbb2927e66d21106438 a44abd32374739a1cd92adeaebbd965ea2e5e25a Mauricio Barrera <mauricio@le.mu> 1747702962 -0400	checkout: moving from proyecto_limpio to a44abd32374739a1cd92adeaebbd965ea2e5e25a
+a44abd32374739a1cd92adeaebbd965ea2e5e25a baa7f8850c0cc809842d78d24bb81f9559d75526 Mauricio Barrera <mauricio@le.mu> 1747703093 -0400	checkout: moving from a44abd32374739a1cd92adeaebbd965ea2e5e25a to baa7f8850c0cc809842d78d24bb81f9559d75526
+baa7f8850c0cc809842d78d24bb81f9559d75526 6bb55504834be7daba38116362561118f34145fd Mauricio Barrera <mauricio@le.mu> 1747703501 -0400	commit: Fix: MapBox token implementation by hardcoding in Map.js
+6bb55504834be7daba38116362561118f34145fd 6bb55504834be7daba38116362561118f34145fd Mauricio Barrera <mauricio@le.mu> 1747703512 -0400	checkout: moving from 6bb55504834be7daba38116362561118f34145fd to mapbox-fix

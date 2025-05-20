@@ -42,12 +42,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
     'travel_api',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -145,4 +147,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Media Files (Uploads, Photos, etc.)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR.parent  # Apunta a la carpeta raíz del proyecto (donde está photos/)
+MEDIA_ROOT = os.path.join(BASE_DIR.parent, '')  # Apunta a la carpeta raíz del proyecto
+
+# Asegurarse de que DEBUG esté en True para desarrollo
+DEBUG = True
+
+# Permitir todas las hosts para desarrollo
+ALLOWED_HOSTS = ['*']  # Apunta a la carpeta raíz del proyecto
+
+# Configuración CORS
+CORS_ALLOW_ALL_ORIGINS = True  # En producción, definir específicamente los orígenes permitidos
+CORS_ALLOW_CREDENTIALS = True

@@ -67,18 +67,12 @@ def mapa_data(request):
         if foto_principal:
             # Construir URLs para miniaturas y imágenes completas
             if foto_principal.thumbnail_url:
-                # Asegurarnos de que apunta directamente a /media/photos/thumbnails/
-                thumb_filename = foto_principal.thumbnail_url.split('/')[-1]
-                thumbnail = request.build_absolute_uri(f'/media/photos/thumbnails/{thumb_filename}')
+                # La URL completa para el thumbnail
+                thumbnail = request.build_absolute_uri('/media/' + foto_principal.thumbnail_url)
             
             if foto_principal.url_imagen:
-                # Asegurarnos de que apunta directamente a /media/photos/
-                image_filename = foto_principal.url_imagen.split('/')[-1]
-                imagen_completa = request.build_absolute_uri(f'/media/photos/{image_filename}')
-            
-            # Si tenemos thumbnail pero no imagen completa, inferir la imagen completa
-            if thumbnail and not imagen_completa and '_thumb.' in thumbnail:
-                imagen_completa = thumbnail.replace('/thumbnails/', '/').replace('_thumb.', '.')
+                # La URL completa para la imagen
+                imagen_completa = request.build_absolute_uri('/media/' + foto_principal.url_imagen)
         
         resultado.append({
             'id': lugar.id,

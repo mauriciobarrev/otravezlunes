@@ -1,0 +1,4 @@
+0000000000000000000000000000000000000000 f507274a881487e6b2d3c7d0ca8443a5bc0bee1b Mauricio Barrera <mauricio@le.mu> 1747701569 -0400	branch: Created from HEAD
+f507274a881487e6b2d3c7d0ca8443a5bc0bee1b 98a892a8e0a62de3f64402a8db06b40574bdc337 Mauricio Barrera <mauricio@le.mu> 1747701953 -0400	commit: Estado completo del proyecto (backend funcional con modelos de lugares y fotos)
+98a892a8e0a62de3f64402a8db06b40574bdc337 b896f8899938d0207002bc65ac7c5572c0d57ef9 Mauricio Barrera <mauricio@le.mu> 1747702223 -0400	commit: frontend v0.0.1
+b896f8899938d0207002bc65ac7c5572c0d57ef9 60e7235ef3ef729194915bbb2927e66d21106438 Mauricio Barrera <mauricio@le.mu> 1747702279 -0400	commit: Eliminar directorios de backup innecesarios

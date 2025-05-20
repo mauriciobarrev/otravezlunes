@@ -1,0 +1,7 @@
+# pack-refs with: peeled fully-peeled sorted 
+f507274a881487e6b2d3c7d0ca8443a5bc0bee1b refs/heads/develop
+6bb55504834be7daba38116362561118f34145fd refs/heads/mapbox-fix
+60e7235ef3ef729194915bbb2927e66d21106438 refs/heads/proyecto_limpio
+7fd09129f9896e034f3d7fb8c3b7e7d200efffa8 refs/tags/v0.0.1
+f507274a881487e6b2d3c7d0ca8443a5bc0bee1b refs/tags/v0.0.1-full
+98a892a8e0a62de3f64402a8db06b40574bdc337 refs/tags/v0.1.0-backend
