@@ -179,80 +179,133 @@ function Map({ onMarkerClick }) {
         e.stopPropagation();
         console.log("Marcador clickeado:", place);
         
-        // Intentar obtener información completa del lugar desde la API
-        (async () => {
-          try {
-            const response = await fetch(`/api/lugares/${place.id}/`);
-            if (!response.ok) {
-              throw new Error(`Error al cargar el lugar: ${response.status}`);
+        // Verificar el tipo de marcador
+        if (place.tipo_marcador === 'foto_blog') {
+          // Es un marcador individual de foto de entrada de blog
+          (async () => {
+            try {
+              const response = await fetch(`/api/entrada-blog-galeria/${place.entrada_id}/${place.foto_id}/`);
+              if (!response.ok) {
+                throw new Error(`Error al cargar la entrada de blog: ${response.status}`);
+              }
+              
+              const galeriaData = await response.json();
+              console.log("Datos de galería desde API:", galeriaData);
+              
+              const placeData = {
+                id: galeriaData.lugar.id,
+                name: galeriaData.lugar.nombre || 'Lugar sin nombre',
+                city: galeriaData.lugar.ciudad || '',
+                country: galeriaData.lugar.pais || '',
+                description: galeriaData.lugar.descripcion || 'Sin descripción',
+                blogEntry: {
+                  id: galeriaData.entrada.id,
+                  title: galeriaData.entrada.titulo,
+                  content: galeriaData.entrada.contenido,
+                  date: galeriaData.entrada.fecha_publicacion
+                },
+                activePhotoIndex: galeriaData.foto_activa_index,
+                photos: galeriaData.fotos.map(foto => ({
+                  id: foto.id || foto.uuid,
+                  url: processImageUrl(foto.url),
+                  thumbnail: processImageUrl(foto.thumbnail),
+                  caption: foto.caption || foto.description || '',
+                  date: foto.date || '',
+                  description: foto.description || foto.caption || '',
+                  orden: foto.orden || 0
+                }))
+              };
+              
+              onMarkerClick(placeData);
+            } catch (err) {
+              console.error("Error al cargar galería de entrada de blog:", err);
+              
+              // Fallback usando los datos del marcador
+              const placeData = {
+                id: place.lugar_id,
+                name: place.nombre || 'Lugar sin nombre',
+                city: place.ciudad || '',
+                country: place.pais || '',
+                description: place.descripcion || 'Sin descripción',
+                activePhotoIndex: 0,
+                photos: [{
+                  id: place.foto_id,
+                  url: processImageUrl(place.imagen_completa) || processImageUrl(place.thumbnail),
+                  thumbnail: processImageUrl(place.thumbnail),
+                  caption: place.foto_descripcion || place.entrada_titulo || '',
+                  date: '',
+                  description: place.foto_descripcion || ''
+                }]
+              };
+              
+              onMarkerClick(placeData);
             }
-            
-            const lugarData = await response.json();
-            console.log("Datos del lugar desde API:", lugarData);
-            
-            // Preparar fotos para la galería
-            const fotos = lugarData.fotografias || [];
-            
-            // Preparar datos para el modal
-            const placeData = {
-              id: lugarData.id,
-              name: lugarData.nombre || place.nombre || 'Lugar sin nombre',
-              city: lugarData.ciudad || place.ciudad || '',
-              country: lugarData.pais || place.pais || '',
-              description: lugarData.descripcion_corta || place.descripcion || 'Sin descripción',
-              activePhotoIndex: 0,
-              photos: fotos.length > 0 ? fotos.map(foto => ({
-                id: foto.id || foto.uuid,
-                url: foto.imagen_alta_calidad_url || getHighQualityImageUrl(foto.imagen_url) || foto.imagen_url,
-                caption: foto.direccion_captura || `${lugarData.nombre}, ${lugarData.ciudad}, ${lugarData.pais}`,
-                date: foto.fecha_toma || '',
-                description: foto.descripcion || ''
-              })) : [{
-                id: place.id || 'photo1',
-                url: place.imagen_completa || getHighQualityImageUrl(place.thumbnail) || place.thumbnail || '',
-                caption: place.nombre || '',
-                date: '',
-                description: place.descripcion || 'Sin descripción'
-              }]
-            };
-            
-            // Llamar al callback con los datos
-            onMarkerClick(placeData);
-          } catch (err) {
-            console.error("Error al cargar detalles del lugar:", err);
-            
-            // Usar datos del marcador como fallback
-            const placeData = {
-              id: place.id,
-              name: place.nombre || 'Lugar sin nombre',
-              city: place.ciudad || '',
-              country: place.pais || '',
-              description: place.descripcion || 'Sin descripción',
-              activePhotoIndex: 0,
-              photos: [{
-                id: place.id || 'photo1',
-                url: place.imagen_completa || getHighQualityImageUrl(place.thumbnail) || place.thumbnail || '',
-                caption: place.nombre || '',
-                date: '',
-                description: place.descripcion || 'Sin descripción'
-              }]
-            };
-            
-            // Llamar al callback con los datos de fallback
-            onMarkerClick(placeData);
-          }
-        })();
+          })();
+        } else {
+          // Comportamiento original para lugares simples sin entradas de blog
+          (async () => {
+            try {
+              const response = await fetch(`/api/lugares/${place.lugar_id}/`);
+              if (!response.ok) {
+                throw new Error(`Error al cargar el lugar: ${response.status}`);
+              }
+              
+              const lugarData = await response.json();
+              console.log("Datos del lugar desde API (lugar simple):", lugarData);
+              
+              // Preparar fotos para la galería (comportamiento original)
+              const fotos = lugarData.fotografias || [];
+              
+              const placeData = {
+                id: lugarData.id,
+                name: lugarData.nombre || place.nombre || 'Lugar sin nombre',
+                city: lugarData.ciudad || place.ciudad || '',
+                country: lugarData.pais || place.pais || '',
+                description: lugarData.descripcion_corta || place.descripcion || 'Sin descripción',
+                activePhotoIndex: 0,
+                photos: fotos.length > 0 ? fotos.map(foto => ({
+                  id: foto.id || foto.uuid,
+                  url: foto.imagen_alta_calidad_url || getHighQualityImageUrl(foto.imagen_url) || foto.imagen_url,
+                  caption: foto.direccion_captura || `${lugarData.nombre}, ${lugarData.ciudad}, ${lugarData.pais}`,
+                  date: foto.fecha_toma || '',
+                  description: foto.descripcion || ''
+                })) : [{
+                  id: place.id || 'photo1',
+                  url: place.imagen_completa || getHighQualityImageUrl(place.thumbnail) || place.thumbnail || '',
+                  caption: place.nombre || '',
+                  date: '',
+                  description: place.descripcion || 'Sin descripción'
+                }]
+              };
+              
+              onMarkerClick(placeData);
+            } catch (err) {
+              console.error("Error al cargar detalles del lugar:", err);
+              
+              // Usar datos del marcador como fallback
+              const placeData = {
+                id: place.id,
+                name: place.nombre || 'Lugar sin nombre',
+                city: place.ciudad || '',
+                country: place.pais || '',
+                description: place.descripcion || 'Sin descripción',
+                activePhotoIndex: 0,
+                photos: [{
+                  id: place.id || 'photo1',
+                  url: place.imagen_completa || getHighQualityImageUrl(place.thumbnail) || place.thumbnail || '',
+                  caption: place.nombre || '',
+                  date: '',
+                  description: place.descripcion || 'Sin descripción'
+                }]
+              };
+              
+              onMarkerClick(placeData);
+            }
+          })();
+        }
       });
     });
     
-    // Si hay lugares, centrar el mapa en el primero
-    if (places.length > 0 && places[0].coordinates) {
-      map.flyTo({
-        center: places[0].coordinates,
-        zoom: 5,
-        essential: true
-      });
-    }
     
   }, [map, places, onMarkerClick]);
 

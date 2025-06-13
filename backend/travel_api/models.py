@@ -23,6 +23,7 @@ class Lugar(models.Model):
 class Fotografia(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, help_text="Identificador único universal para la fotografía.")
     lugar = models.ForeignKey(Lugar, related_name='fotografias', on_delete=models.CASCADE)
+    entrada_blog = models.ForeignKey('EntradaDeBlog', related_name='fotografias', on_delete=models.CASCADE, null=True, blank=True, help_text="Entrada de blog a la que pertenece esta fotografía.")
     url_imagen = models.URLField(max_length=500) # O models.ImageField si las vas a subir y servir directamente con Django
     thumbnail_url = models.URLField(max_length=550, blank=True, null=True, help_text="URL/path del thumbnail de la fotografía.")
     autor_fotografia = models.CharField(max_length=150, blank=True, null=True, help_text="Nombre de la persona que tomó la fotografía")
@@ -31,12 +32,13 @@ class Fotografia(models.Model):
     palabras_clave = models.CharField(max_length=255, blank=True, null=True, help_text="Separadas por comas.")
     es_foto_principal_lugar = models.BooleanField(default=False, help_text="Indica si esta es la foto icónica principal del Lugar (para el pop-up). Considerar lógica para asegurar solo una.")
     direccion_captura = models.TextField(blank=True, null=True, help_text="Dirección textual o descripción de la ubicación donde se tomó la foto.")
+    orden_en_entrada = models.PositiveIntegerField(default=0, help_text="Orden de la fotografía dentro de la entrada de blog.")
 
     def __str__(self):
         return f"Foto de {self.lugar.nombre} ({self.id})"
     
     class Meta:
-        ordering = ['-fecha_toma']
+        ordering = ['entrada_blog', 'orden_en_entrada', '-fecha_toma']
 
 class EntradaDeBlog(models.Model):
     titulo = models.CharField(max_length=255)

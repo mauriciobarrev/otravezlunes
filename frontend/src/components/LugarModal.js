@@ -5,6 +5,7 @@ const LugarModal = ({ lugar, onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [errorLoading, setErrorLoading] = useState(false);
+  const [imageOpacity, setImageOpacity] = useState(1);
 
   useEffect(() => {
     // Usar activePhotoIndex si está disponible, sino usar 0
@@ -25,10 +26,24 @@ const LugarModal = ({ lugar, onClose }) => {
       }
     };
     
+    // Permitir scroll en el body para la página completa de la galería
+    document.body.style.overflow = 'auto';
+    
     window.addEventListener('keydown', handleEscape);
+    
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const fadeEnd = window.innerHeight * 0.6; // 60% viewport height
+      const newOpacity = Math.max(1 - scrollTop / fadeEnd, 0);
+      setImageOpacity(newOpacity);
+    };
+    window.addEventListener('scroll', handleScroll);
     
     return () => {
       window.removeEventListener('keydown', handleEscape);
+      // Restaurar scroll del body
+      document.body.style.overflow = 'unset';
+      window.removeEventListener('scroll', handleScroll);
     };
   }, [lugar, onClose]);
 
@@ -115,7 +130,7 @@ const LugarModal = ({ lugar, onClose }) => {
       <div className="gallery-modal-content" onClick={handleModalContentClick}>
         <button className="modal-close-button" onClick={onClose}>&times;</button>
         
-        <div className="gallery-image-container">
+        <div className="gallery-image-container" style={{ opacity: imageOpacity }}>
           {!imageLoaded && !errorLoading && (
             <div className="loading-image">Cargando imagen...</div>
           )}
@@ -143,24 +158,65 @@ const LugarModal = ({ lugar, onClose }) => {
               <button className="gallery-nav-button next" onClick={goToNext}>&#10095;</button>
             </>
           )}
-        </div>
 
-        <div className="gallery-info">
-          <h3>{lugar.name}</h3>
-          <div className="location-info">
-            {lugar.city && lugar.country && (
-              <p className="location">{lugar.city}, {lugar.country}</p>
-            )}
-          </div>
-          {currentPhoto.caption && <p className="photo-caption">{currentPhoto.caption}</p>}
-          <p className="photo-counter">{currentIndex + 1} / {lugar.photos.length}</p>
-          {currentPhoto.date && <p className="photo-date">{currentPhoto.date}</p>}
-          {lugar.description && <p className="lugar-description">{lugar.description}</p>}
-          {currentPhoto.description && currentPhoto.description !== lugar.description && (
-            <p className="photo-description">{currentPhoto.description}</p>
+          {lugar.photos.length > 1 && (
+            <div className="photo-counter-image">
+              {currentIndex + 1} / {lugar.photos.length}
+            </div>
           )}
         </div>
 
+        <div className="gallery-content">
+          {/* Remove gallery-header and show blog entry first */}
+
+          {lugar.blogEntry && (
+            <div className="blog-entry-info">
+              <h2 className="blog-title">{lugar.blogEntry.title}</h2>
+              {lugar.blogEntry.date && (
+                <p className="blog-date">
+                  {new Date(lugar.blogEntry.date).toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </p>
+              )}
+              <div className="blog-content">
+                {lugar.blogEntry.content && (
+                  <div dangerouslySetInnerHTML={{
+                    __html: lugar.blogEntry.content.replace(/\n/g, '<br/>')
+                  }} />
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="photo-info">
+            {currentPhoto.caption && (
+              <p className="photo-caption">{currentPhoto.caption}</p>
+            )}
+            
+            {currentPhoto.date && (
+              <p className="photo-date">
+                {new Date(currentPhoto.date).toLocaleDateString('es-ES', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </p>
+            )}
+            
+            {!lugar.blogEntry && lugar.description && (
+              <div className="lugar-description">
+                <p>{lugar.description}</p>
+              </div>
+            )}
+            
+            {currentPhoto.description && currentPhoto.description !== lugar.description && (
+              <p className="photo-description">{currentPhoto.description}</p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

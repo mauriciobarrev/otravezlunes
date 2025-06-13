@@ -19,6 +19,10 @@ class FotografiaSerializer(serializers.ModelSerializer):
     lugar_pais = serializers.CharField(source='lugar.pais', read_only=True)
     coordenadas = serializers.SerializerMethodField()
     
+    # Información de la entrada de blog
+    entrada_blog_titulo = serializers.CharField(source='entrada_blog.titulo', read_only=True)
+    entrada_blog_id = serializers.IntegerField(source='entrada_blog.id', read_only=True)
+    
     # URLs absolutas para las imágenes
     imagen_url = serializers.SerializerMethodField()
     thumbnail_url_absoluta = serializers.SerializerMethodField()
@@ -28,6 +32,7 @@ class FotografiaSerializer(serializers.ModelSerializer):
         model = Fotografia
         fields = [
             'id', 'uuid', 'lugar', 'lugar_nombre', 'lugar_ciudad', 'lugar_pais',
+            'entrada_blog', 'entrada_blog_titulo', 'entrada_blog_id', 'orden_en_entrada',
             'imagen_url', 'thumbnail_url_absoluta', 'imagen_alta_calidad_url', 'autor_fotografia', 'fecha_toma',
             'descripcion', 'palabras_clave', 'coordenadas', 'direccion_captura'
         ]
@@ -83,15 +88,29 @@ class FotografiaSerializer(serializers.ModelSerializer):
         # Si no hay información suficiente, devolvemos None
         return None
 
+class EntradaDeBlogConFotosSerializer(serializers.ModelSerializer):
+    """Serializer para mostrar una entrada de blog con todas sus fotografías"""
+    fotografias = FotografiaSerializer(many=True, read_only=True)
+    autor_info = UserSerializer(source='autor', read_only=True)
+    lugar_asociado_info = LugarSerializer(source='lugar_asociado', read_only=True)
+    
+    class Meta:
+        model = EntradaDeBlog
+        fields = [
+            'id', 'titulo', 'lugar_asociado', 'lugar_asociado_info',
+            'fecha_publicacion', 'autor', 'autor_info', 'contenido', 'fotografias'
+        ]
+
 class LugarDetalleSerializer(serializers.ModelSerializer):
-    """Serializer para mostrar un lugar con todas sus fotografías"""
+    """Serializer para mostrar un lugar con todas sus entradas de blog y fotografías"""
+    entradas_blog = EntradaDeBlogConFotosSerializer(many=True, read_only=True)
     fotografias = FotografiaSerializer(many=True, read_only=True)
     
     class Meta:
         model = Lugar
         fields = [
             'id', 'nombre', 'ciudad', 'pais', 'latitud', 'longitud',
-            'descripcion_corta', 'foto_iconica_url', 'fotografias'
+            'descripcion_corta', 'foto_iconica_url', 'entradas_blog', 'fotografias'
         ]
 
 class EntradaDeBlogSerializer(serializers.ModelSerializer):
