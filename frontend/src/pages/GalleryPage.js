@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import LugarModal from '../components/LugarModal';
+import BlogEntryModal from '../components/BlogEntryModal';
 
 function processImageUrl(url) {
   if (!url) return 'https://via.placeholder.com/800x600?text=No+Image';
@@ -48,6 +48,7 @@ const GalleryPage = () => {
           blogEntry: {
             id: galeriaData.entrada.id,
             title: galeriaData.entrada.titulo,
+            description: galeriaData.entrada.descripcion,
             content: galeriaData.entrada.contenido,
             date: galeriaData.entrada.fecha_publicacion
           },
@@ -83,7 +84,7 @@ const GalleryPage = () => {
   if (error) return <div className="error-message">Error: {error}</div>;
   if (!lugar) return null;
 
-  return <LugarModal lugar={lugar} onClose={handleClose} />;
+  return <BlogEntryModal lugar={lugar} onClose={handleClose} />;
 };
 
 export default GalleryPage; 

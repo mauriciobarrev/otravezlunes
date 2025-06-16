@@ -42,6 +42,7 @@ class Fotografia(models.Model):
 
 class EntradaDeBlog(models.Model):
     titulo = models.CharField(max_length=255)
+    descripcion = models.TextField(blank=True, null=True, help_text="Descripción breve de la entrada de blog para mostrar en el hero.")
     lugar_asociado = models.ForeignKey(Lugar, related_name='entradas_blog', on_delete=models.SET_NULL, blank=True, null=True, help_text="Lugar principal al que se refiere esta entrada, si aplica.")
     # Se podrían asociar múltiples lugares a una entrada de blog con un ManyToManyField si fuera necesario.
     # lugares = models.ManyToManyField(Lugar, related_name='entradas_blog_asociadas', blank=True)

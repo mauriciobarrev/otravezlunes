@@ -196,6 +196,7 @@ def entrada_blog_galeria(request, entrada_id, foto_id=None):
             'entrada': {
                 'id': entrada.id,
                 'titulo': entrada.titulo,
+                'descripcion': entrada.descripcion,
                 'contenido': entrada.contenido,
                 'fecha_publicacion': entrada.fecha_publicacion.strftime('%Y-%m-%d %H:%M:%S')
             },

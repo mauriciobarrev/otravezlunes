@@ -97,7 +97,7 @@ class EntradaDeBlogConFotosSerializer(serializers.ModelSerializer):
     class Meta:
         model = EntradaDeBlog
         fields = [
-            'id', 'titulo', 'lugar_asociado', 'lugar_asociado_info',
+            'id', 'titulo', 'descripcion', 'lugar_asociado', 'lugar_asociado_info',
             'fecha_publicacion', 'autor', 'autor_info', 'contenido', 'fotografias'
         ]
 
@@ -122,6 +122,7 @@ class EntradaDeBlogSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'titulo',
+            'descripcion',
             'lugar_asociado', # FK
             'lugar_asociado_info',
             'fecha_publicacion',

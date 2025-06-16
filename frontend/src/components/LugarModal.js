@@ -126,7 +126,7 @@ const LugarModal = ({ lugar, onClose }) => {
   };
 
   return (
-    <div className="modal-backdrop" onClick={onClose}> {/* El backdrop cierra el modal */}
+    <div className="modal-backdrop"> {/* Remove onClick since this is now a full page */}
       <div className="gallery-modal-content" onClick={handleModalContentClick}>
         <button className="modal-close-button" onClick={onClose}>&times;</button>
         
@@ -190,32 +190,6 @@ const LugarModal = ({ lugar, onClose }) => {
               </div>
             </div>
           )}
-
-          <div className="photo-info">
-            {currentPhoto.caption && (
-              <p className="photo-caption">{currentPhoto.caption}</p>
-            )}
-            
-            {currentPhoto.date && (
-              <p className="photo-date">
-                {new Date(currentPhoto.date).toLocaleDateString('es-ES', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </p>
-            )}
-            
-            {!lugar.blogEntry && lugar.description && (
-              <div className="lugar-description">
-                <p>{lugar.description}</p>
-              </div>
-            )}
-            
-            {currentPhoto.description && currentPhoto.description !== lugar.description && (
-              <p className="photo-description">{currentPhoto.description}</p>
-            )}
-          </div>
         </div>
       </div>
     </div>
