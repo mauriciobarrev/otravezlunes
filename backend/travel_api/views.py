@@ -197,7 +197,9 @@ def entrada_blog_galeria(request, entrada_id, foto_id=None):
                 'id': entrada.id,
                 'titulo': entrada.titulo,
                 'descripcion': entrada.descripcion,
-                'contenido': entrada.contenido,
+                'contenido_procesado': entrada.contenido_html or entrada.contenido_markdown,
+                'contenido_markdown': entrada.contenido_markdown,
+                'content': entrada.contenido_html or entrada.contenido_markdown,  # Compatibilidad
                 'fecha_publicacion': entrada.fecha_publicacion.strftime('%Y-%m-%d %H:%M:%S')
             },
             'fotos': fotos_data,

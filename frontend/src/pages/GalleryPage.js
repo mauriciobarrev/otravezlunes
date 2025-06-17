@@ -49,7 +49,8 @@ const GalleryPage = () => {
             id: galeriaData.entrada.id,
             title: galeriaData.entrada.titulo,
             description: galeriaData.entrada.descripcion,
-            content: galeriaData.entrada.contenido,
+            contenido_procesado: galeriaData.entrada.contenido_procesado || galeriaData.entrada.content,
+            content: galeriaData.entrada.content || galeriaData.entrada.contenido_procesado,
             date: galeriaData.entrada.fecha_publicacion
           },
           activePhotoIndex: galeriaData.foto_activa_index,

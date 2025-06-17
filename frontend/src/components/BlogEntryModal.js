@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
 import './BlogEntryModal.css';
 
 const BlogEntryModal = ({ lugar, onClose }) => {
@@ -70,6 +74,13 @@ const BlogEntryModal = ({ lugar, onClose }) => {
 
   return (
     <div className="modal-backdrop">
+      {/* Top Navigation */}
+      <nav className="top-navigation">
+        <button className="nav-button" onClick={onClose}>
+          Mapa
+        </button>
+      </nav>
+
       {/* HERO */}
       <section className="blog-hero" style={{ opacity: heroOpacity }}>
         <div className="hero-overlay">
@@ -110,13 +121,60 @@ const BlogEntryModal = ({ lugar, onClose }) => {
       </section>
 
       {/* ARTICLE */}
-      {lugar.blogEntry?.content && (
-        <section
-          className="blog-article"
-          dangerouslySetInnerHTML={{
-            __html: lugar.blogEntry.content.replace(/\n/g, '<br/>'),
-          }}
-        />
+      {(lugar.blogEntry?.contenido_procesado || lugar.blogEntry?.content) && (
+        <section className="blog-article">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw, rehypeSanitize]}
+            components={{
+              // Personalizar componentes de renderizado
+              h1: ({ children }) => <h1 className="blog-h1">{children}</h1>,
+              h2: ({ children }) => <h2 className="blog-h2">{children}</h2>,
+              h3: ({ children }) => <h3 className="blog-h3">{children}</h3>,
+              h4: ({ children }) => <h4 className="blog-h4">{children}</h4>,
+              h5: ({ children }) => <h5 className="blog-h5">{children}</h5>,
+              h6: ({ children }) => <h6 className="blog-h6">{children}</h6>,
+              p: ({ children }) => <p className="blog-paragraph">{children}</p>,
+              blockquote: ({ children }) => <blockquote className="blog-quote">{children}</blockquote>,
+              code: ({ inline, className, children, ...props }) => {
+                return inline ? (
+                  <code className="blog-inline-code" {...props}>
+                    {children}
+                  </code>
+                ) : (
+                  <code className="blog-code-block" {...props}>
+                    {children}
+                  </code>
+                );
+              },
+              pre: ({ children }) => <pre className="blog-pre">{children}</pre>,
+              img: ({ src, alt }) => (
+                <img 
+                  src={src} 
+                  alt={alt} 
+                  className="blog-image" 
+                  loading="lazy"
+                />
+              ),
+              a: ({ href, children }) => (
+                <a 
+                  href={href} 
+                  className="blog-link"
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  {children}
+                </a>
+              ),
+              table: ({ children }) => <table className="blog-table">{children}</table>,
+              ul: ({ children }) => <ul className="blog-list">{children}</ul>,
+              ol: ({ children }) => <ol className="blog-ordered-list">{children}</ol>,
+              li: ({ children }) => <li className="blog-list-item">{children}</li>,
+            }}
+          >
+            {lugar.blogEntry?.contenido_procesado || lugar.blogEntry?.content || ''}
+          </ReactMarkdown>
+        </section>
       )}
     </div>
   );

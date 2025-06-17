@@ -182,9 +182,9 @@ const LugarModal = ({ lugar, onClose }) => {
                 </p>
               )}
               <div className="blog-content">
-                {lugar.blogEntry.content && (
+                {(lugar.blogEntry.contenido_procesado || lugar.blogEntry.content) && (
                   <div dangerouslySetInnerHTML={{
-                    __html: lugar.blogEntry.content.replace(/\n/g, '<br/>')
+                    __html: (lugar.blogEntry.contenido_procesado || lugar.blogEntry.content).replace(/\n/g, '<br/>')
                   }} />
                 )}
               </div>

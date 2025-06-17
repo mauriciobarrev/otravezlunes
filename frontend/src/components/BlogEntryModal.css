@@ -1,11 +1,64 @@
 /* --- BlogEntryModal styles --- */
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow+Condensed:wght@300;400;500&display=swap');
 
+/* Top Navigation */
+.top-navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: rgba(13, 13, 13, 0.95);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-button {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+  background: transparent;
+  border: none;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.nav-button:hover {
+  color: #F16920;
+}
+
+.nav-button::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 1px;
+  background-color: #F16920;
+  transition: width 0.3s ease;
+}
+
+.nav-button:hover::after {
+  width: 60%;
+}
+
 /* Smooth scrolling and hide scrollbars */
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 0;
-  overflow-x: hidden;
+  overflow-x: hidden; /* por defecto ocultamos scroll horizontal */
 }
 
 body {
@@ -206,6 +259,221 @@ html {
   font-family: 'Georgia', serif;
 }
 
+/* Estilos para elementos de Markdown */
+.blog-h1 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #F16920;
+  margin: 3rem 0 1.5rem 0;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.blog-h2 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 2rem;
+  font-weight: 500;
+  color: #fff;
+  margin: 2.5rem 0 1rem 0;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #333;
+  padding-bottom: 0.5rem;
+}
+
+.blog-h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #F16920;
+  margin: 2rem 0 1rem 0;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.blog-h4 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #fff;
+  margin: 1.8rem 0 0.8rem 0;
+  text-transform: uppercase;
+}
+
+.blog-h5 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: #ccc;
+  margin: 1.5rem 0 0.7rem 0;
+  text-transform: uppercase;
+}
+
+.blog-h6 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #aaa;
+  margin: 1.3rem 0 0.6rem 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.blog-paragraph {
+  margin: 1.5rem 0;
+  text-align: justify;
+  color: #ddd;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+.blog-quote {
+  border-left: 4px solid #F16920;
+  margin: 2.5rem 0;
+  padding: 1.5rem 2rem;
+  background: rgba(241, 105, 32, 0.1);
+  font-style: italic;
+  color: #fff;
+  border-radius: 0 8px 8px 0;
+  backdrop-filter: blur(5px);
+}
+
+.blog-quote p {
+  margin: 0;
+  color: #fff;
+}
+
+.blog-inline-code {
+  background: rgba(255, 255, 255, 0.1);
+  color: #F16920;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.9em;
+  border: 1px solid rgba(241, 105, 32, 0.3);
+}
+
+.blog-code-block {
+  display: block;
+  background: #1a1a1a;
+  color: #e2e8f0;
+  padding: 2rem;
+  border-radius: 8px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85em;
+  line-height: 1.6;
+  overflow-x: auto;
+  margin: 2rem 0;
+  border: 1px solid #333;
+}
+
+.blog-pre {
+  margin: 0;
+  overflow-x: auto;
+}
+
+.blog-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 3rem auto;
+  display: block;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.blog-image:hover {
+  transform: scale(1.02);
+}
+
+.blog-link {
+  color: #F16920;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.blog-link:hover {
+  color: #fff;
+  border-bottom-color: #F16920;
+}
+
+.blog-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2.5rem 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.blog-table th,
+.blog-table td {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.blog-table th {
+  background: rgba(241, 105, 32, 0.2);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 500;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.blog-table td {
+  color: #ddd;
+}
+
+.blog-table tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.blog-list,
+.blog-ordered-list {
+  margin: 2rem 0;
+  padding-left: 2rem;
+}
+
+.blog-list-item {
+  margin: 0.8rem 0;
+  line-height: 1.7;
+  color: #ddd;
+}
+
+.blog-list-item::marker {
+  color: #F16920;
+}
+
+/* Strong y Emphasis */
+.blog-article strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.blog-article em {
+  color: #F16920;
+  font-style: italic;
+}
+
+/* Líneas horizontales */
+.blog-article hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #F16920, transparent);
+  margin: 3rem 0;
+}
+
 /* Responsive tweaks */
 @media (max-width: 1024px) {
   .blog-photo-feed {
@@ -246,6 +514,33 @@ html {
     width: 6px;
     height: 6px;
   }
+  
+  .top-navigation {
+    height: 50px;
+  }
+  
+  .nav-button {
+    font-size: 0.8rem;
+    padding: 10px 20px;
+    letter-spacing: 1.8px;
+  }
+  
+  /* Ajustes de texto para pantallas medianas */
+  .blog-article {
+    font-size: 1.15rem; /* aumentar ligeramente para mejor legibilidad */
+    line-height: 1.85;
+    padding: 0 16px;
+  }
+  .blog-h1 {
+    font-size: 2.3rem;
+    letter-spacing: 0.8px;
+  }
+  .blog-h2 {
+    font-size: 1.7rem;
+  }
+  .blog-h3 {
+    font-size: 1.4rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -262,5 +557,106 @@ html {
   .scroll-indicator {
     bottom: 25px;
     gap: 8px;
+  }
+  
+  .top-navigation {
+    height: 45px;
+  }
+  
+  .nav-button {
+    font-size: 0.75rem;
+    padding: 8px 16px;
+    letter-spacing: 1.5px;
+  }
+  
+  /* Ajustes de texto para pantallas pequeñas */
+  .blog-article {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    padding: 0 14px;
+  }
+  .blog-h1 {
+    font-size: 2rem;
+    letter-spacing: 0.7px;
+  }
+  .blog-h2 {
+    font-size: 1.5rem;
+  }
+  .blog-h3 {
+    font-size: 1.25rem;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Fluid-typography & word-wrapping overrides (después de todos los media-queries) */
+
+/* Asegurar que todo el contenido del artículo se adapte y no se corte en móviles */
+.blog-article {
+  /* Escala de font-size entre 1rem (móvil) y 1.25rem (desktop) */
+  font-size: clamp(1rem, 4vw, 1.25rem);
+  line-height: 1.8;
+  padding-left: clamp(12px, 4vw, 24px);
+  padding-right: clamp(12px, 4vw, 24px);
+  box-sizing: border-box; /* padding incluido en el ancho */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Encabezados fluidos */
+.blog-article .blog-h1 {
+  font-size: clamp(2rem, 9vw, 2.8rem);
+  letter-spacing: 0.5px;
+}
+
+.blog-article .blog-h2 {
+  font-size: clamp(1.6rem, 7vw, 2.2rem);
+}
+
+.blog-article .blog-h3 {
+  font-size: clamp(1.3rem, 6vw, 1.8rem);
+}
+
+/* Garantizar que cualquier elemento dentro del artículo no exceda el ancho */
+.blog-article *,
+.blog-article *:before,
+.blog-article *:after {
+  box-sizing: border-box;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Para móviles permitimos scroll horizontal (ej. tablas) en lugar de recortar */
+@media (max-width: 480px) {
+  html {
+    overflow-x: auto;
+  }
+}
+
+/* ----------------------  Tablas responsivas  ---------------------- */
+@media (max-width: 768px) {
+  .blog-table {
+    display: block;            /* permite scroll interno */
+    overflow-x: auto;
+    width: 100%;
+    -webkit-overflow-scrolling: touch; /* inercia en iOS */
+  }
+
+  .blog-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .blog-table th,
+  .blog-table td {
+    min-width: 120px; /* evita columnas demasiado estrechas y mantiene legibilidad */
+    white-space: nowrap;
+  }
+}
+
+/* En pantallas pequeñas el artículo ocupa todo el ancho disponible */
+@media (max-width: 768px) {
+  .blog-article {
+    max-width: 100%;
   }
 } 

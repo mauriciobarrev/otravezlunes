@@ -93,13 +93,21 @@ class EntradaDeBlogConFotosSerializer(serializers.ModelSerializer):
     fotografias = FotografiaSerializer(many=True, read_only=True)
     autor_info = UserSerializer(source='autor', read_only=True)
     lugar_asociado_info = LugarSerializer(source='lugar_asociado', read_only=True)
+    contenido_procesado = serializers.CharField(source='contenido_html', read_only=True)
+    extracto = serializers.SerializerMethodField()
     
     class Meta:
         model = EntradaDeBlog
         fields = [
             'id', 'titulo', 'descripcion', 'lugar_asociado', 'lugar_asociado_info',
-            'fecha_publicacion', 'autor', 'autor_info', 'contenido', 'fotografias'
+            'fecha_publicacion', 'autor', 'autor_info', 'contenido_markdown', 
+            'contenido_procesado', 'extracto', 'fotografias'
         ]
+    
+    def get_extracto(self, obj):
+        """Genera un extracto del contenido"""
+        from .utils import extract_excerpt
+        return extract_excerpt(obj.contenido_markdown, max_length=200)
 
 class LugarDetalleSerializer(serializers.ModelSerializer):
     """Serializer para mostrar un lugar con todas sus entradas de blog y fotografías"""
@@ -116,6 +124,8 @@ class LugarDetalleSerializer(serializers.ModelSerializer):
 class EntradaDeBlogSerializer(serializers.ModelSerializer):
     autor_info = UserSerializer(source='autor', read_only=True)
     lugar_asociado_info = LugarSerializer(source='lugar_asociado', read_only=True)
+    contenido_procesado = serializers.CharField(source='contenido_html', read_only=True)
+    extracto = serializers.SerializerMethodField()
 
     class Meta:
         model = EntradaDeBlog
@@ -128,6 +138,13 @@ class EntradaDeBlogSerializer(serializers.ModelSerializer):
             'fecha_publicacion',
             'autor', # FK
             'autor_info',
-            'contenido'
+            'contenido_markdown',
+            'contenido_procesado',
+            'extracto'
         ]
-        read_only_fields = ['autor_info', 'lugar_asociado_info'] 
+        read_only_fields = ['autor_info', 'lugar_asociado_info', 'contenido_procesado']
+    
+    def get_extracto(self, obj):
+        """Genera un extracto del contenido"""
+        from .utils import extract_excerpt
+        return extract_excerpt(obj.contenido_markdown, max_length=150) 

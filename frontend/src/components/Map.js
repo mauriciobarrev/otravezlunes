@@ -201,8 +201,10 @@ function Map({ onMarkerClick }) {
                 blogEntry: {
                   id: galeriaData.entrada.id,
                   title: galeriaData.entrada.titulo,
-                  content: galeriaData.entrada.contenido,
-                  date: galeriaData.entrada.fecha_publicacion
+                  content: galeriaData.entrada.contenido_procesado || galeriaData.entrada.content || galeriaData.entrada.contenido_markdown,
+                  contenido_procesado: galeriaData.entrada.contenido_procesado || galeriaData.entrada.content || galeriaData.entrada.contenido_markdown,
+                  date: galeriaData.entrada.fecha_publicacion,
+                  description: galeriaData.entrada.descripcion || ''
                 },
                 activePhotoIndex: galeriaData.foto_activa_index,
                 photos: galeriaData.fotos.map(foto => ({

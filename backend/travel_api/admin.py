@@ -11,34 +11,35 @@ class LugarAdmin(admin.ModelAdmin):
 
 @admin.register(Fotografia)
 class FotografiaAdmin(admin.ModelAdmin):
-    list_display = ('uuid', 'lugar', 'thumbnail_preview', 'autor_fotografia', 'fecha_toma', 'es_foto_principal_lugar', 'direccion_captura')
-    list_filter = ('lugar', 'fecha_toma', 'es_foto_principal_lugar', 'autor_fotografia')
-    search_fields = ('uuid', 'lugar__nombre', 'descripcion', 'palabras_clave', 'autor_fotografia', 'direccion_captura')
-    readonly_fields = ('uuid', 'image_preview', 'thumbnail_preview_large')
+    list_display = ('uuid', 'lugar', 'entrada_blog', 'thumbnail_preview', 'autor_fotografia', 'fecha_toma', 'orden_en_entrada')
+    list_filter = ('lugar', 'entrada_blog', 'fecha_toma', 'es_foto_principal_lugar', 'autor_fotografia')
+    search_fields = ('uuid', 'lugar__nombre', 'entrada_blog__titulo', 'descripcion', 'palabras_clave', 'autor_fotografia')
+    readonly_fields = ('uuid', 'url_imagen', 'thumbnail_url', 'image_preview', 'thumbnail_preview_large')
+    fields = ('lugar', 'entrada_blog', 'imagen', 'thumbnail', 'autor_fotografia', 'fecha_toma', 'descripcion', 'orden_en_entrada', 'es_foto_principal_lugar', 'uuid', 'url_imagen', 'thumbnail_url', 'image_preview', 'thumbnail_preview_large')
 
     def image_preview(self, obj):
-        if obj.url_imagen:
-            # Añadimos el prefijo MEDIA_URL a la ruta de la imagen
-            image_url = f"{settings.MEDIA_URL}{obj.url_imagen}"
-            return format_html('<img src="{}" width="400" height="auto" />', image_url)
+        if obj.imagen:
+            return format_html('<img src="{}" width="400" height="auto" />', obj.imagen.url)
+        elif obj.url_imagen:
+            return format_html('<img src="{}" width="400" height="auto" />', obj.url_imagen)
         return "(No image)"
-    image_preview.short_description = 'Image Preview'
+    image_preview.short_description = 'Vista Previa Imagen'
 
     def thumbnail_preview(self, obj):
-        if obj.thumbnail_url:
-            # Añadimos el prefijo MEDIA_URL a la ruta del thumbnail
-            thumb_url = f"{settings.MEDIA_URL}{obj.thumbnail_url}"
-            return format_html('<img src="{}" width="70" height="auto" />', thumb_url)
+        if obj.thumbnail:
+            return format_html('<img src="{}" width="70" height="auto" />', obj.thumbnail.url)
+        elif obj.thumbnail_url:
+            return format_html('<img src="{}" width="70" height="auto" />', obj.thumbnail_url)
         return "(No thumbnail)"
-    thumbnail_preview.short_description = 'Thumbnail'
+    thumbnail_preview.short_description = 'Miniatura'
 
     def thumbnail_preview_large(self, obj):
-        if obj.thumbnail_url:
-            # Añadimos el prefijo MEDIA_URL a la ruta del thumbnail
-            thumb_url = f"{settings.MEDIA_URL}{obj.thumbnail_url}"
-            return format_html('<img src="{}" width="300" height="auto" />', thumb_url)
+        if obj.thumbnail:
+            return format_html('<img src="{}" width="300" height="auto" />', obj.thumbnail.url)
+        elif obj.thumbnail_url:
+            return format_html('<img src="{}" width="300" height="auto" />', obj.thumbnail_url)
         return "(No thumbnail)"
-    thumbnail_preview_large.short_description = 'Thumbnail Preview (Large)'
+    thumbnail_preview_large.short_description = 'Vista Previa Miniatura'
 
 @admin.register(EntradaDeBlog)
 class EntradaDeBlogAdmin(admin.ModelAdmin):

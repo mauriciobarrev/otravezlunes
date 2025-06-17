@@ -147,7 +147,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Media Files (Uploads, Photos, etc.)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR.parent, '')  # Apunta a la carpeta raíz del proyecto
+MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')  # Apunta a la carpeta media en la raíz del proyecto
 
 # Asegurarse de que DEBUG esté en True para desarrollo
 DEBUG = True
