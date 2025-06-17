@@ -120,7 +120,6 @@ const LugarModal = ({ lugar, onClose }) => {
   
   // Manejar el error de carga de la imagen
   const handleImageError = () => {
-    console.error("Error al cargar la imagen:", imageUrl);
     setErrorLoading(true);
     setImageLoaded(false);
   };

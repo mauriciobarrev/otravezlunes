@@ -16,7 +16,9 @@ root.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-// Silenciar console.* en producción y prevenir descarga sencilla de imágenes
+// Medidas de seguridad y protección de contenido
+
+// Silenciar console.* en producción para no exponer información
 if (process.env.NODE_ENV === 'production') {
   ['log', 'warn', 'error', 'info', 'debug'].forEach(method => {
     // eslint-disable-next-line no-console
@@ -24,10 +26,26 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Deshabilitar menú contextual sobre imágenes para dificultar la descarga
-// (no es una protección absoluta, pero evita la vía rápida «clic derecho ➜ Guardar»)
-document.addEventListener('contextmenu', (e) => {
-  if (e.target && e.target.tagName && e.target.tagName.toLowerCase() === 'img') {
-    e.preventDefault();
-  }
+// Protección básica de imágenes - deshabilitar menú contextual y arrastrar
+document.addEventListener('DOMContentLoaded', () => {
+  // Deshabilitar clic derecho en imágenes
+  document.addEventListener('contextmenu', (e) => {
+    if (e.target && e.target.tagName && e.target.tagName.toLowerCase() === 'img') {
+      e.preventDefault();
+    }
+  });
+
+  // Deshabilitar arrastrar imágenes
+  document.addEventListener('dragstart', (e) => {
+    if (e.target && e.target.tagName && e.target.tagName.toLowerCase() === 'img') {
+      e.preventDefault();
+    }
+  });
+
+  // Deshabilitar selección de imágenes
+  document.addEventListener('selectstart', (e) => {
+    if (e.target && e.target.tagName && e.target.tagName.toLowerCase() === 'img') {
+      e.preventDefault();
+    }
+  });
 });

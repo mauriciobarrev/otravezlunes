@@ -6,11 +6,8 @@ import './Map.css';
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN || '';
 
 if (!mapboxgl.accessToken) {
-  // Avisar solo en desarrollo
-  if (process.env.NODE_ENV !== 'production') {
-    // eslint-disable-next-line no-console
-    console.warn('REACT_APP_MAPBOX_TOKEN no está definido. El mapa podría no funcionar correctamente.');
-  }
+  // Token no definido - el mapa podría no funcionar correctamente
+  // En desarrollo se puede verificar en las variables de entorno
 }
 
 // Datos de ejemplo para usar en caso de fallo
@@ -46,7 +43,6 @@ function Map({ onMarkerClick }) {
   useEffect(() => {
     async function fetchData() {
       try {
-        console.log("Intentando cargar datos de la API...");
         setIsLoading(true);
         
         const response = await fetch('/api/mapa-data/');
@@ -55,16 +51,13 @@ function Map({ onMarkerClick }) {
         }
         
         const data = await response.json();
-        console.log("Datos recibidos de la API:", data);
         
         if (Array.isArray(data) && data.length > 0) {
           setPlaces(data);
         } else {
-          console.warn("No se recibieron datos válidos, usando fallback");
           setPlaces(photosDataFallback);
         }
       } catch (err) {
-        console.error("Error al cargar datos:", err);
         setError(err.message);
         setPlaces(photosDataFallback);
       } finally {
@@ -80,8 +73,6 @@ function Map({ onMarkerClick }) {
     if (isLoading) return;
     if (!mapContainerRef.current) return;
     if (map) return; // Prevenir múltiples inicializaciones
-    
-    console.log("Inicializando mapa");
     
     try {
       // Crear el mapa
@@ -104,7 +95,6 @@ function Map({ onMarkerClick }) {
         setZoom(mapInstance.getZoom().toFixed(2));
       });
     } catch (err) {
-      console.error("Error al inicializar mapa:", err);
       setError(`Error al inicializar mapa: ${err.message}`);
     }
     
@@ -120,8 +110,6 @@ function Map({ onMarkerClick }) {
   useEffect(() => {
     if (!map || places.length === 0) return;
     
-    console.log("Mapa listo, añadiendo marcadores:", places.length);
-    
     // Limpiar marcadores existentes
     markersRef.current.forEach(m => m.remove());
     markersRef.current = [];
@@ -131,7 +119,6 @@ function Map({ onMarkerClick }) {
       // Verificar que tenemos coordenadas válidas
       const coordinates = place.coordinates;
       if (!coordinates || coordinates.length !== 2) {
-        console.warn(`Saltando lugar sin coordenadas válidas:`, place);
         return;
       }
       
@@ -156,7 +143,6 @@ function Map({ onMarkerClick }) {
       };
       img.onerror = () => {
         // Error al cargar la imagen, usar un color de fondo como respaldo
-        console.warn(`Error al cargar la imagen para el marcador: ${imgUrl}`);
         el.style.backgroundImage = 'none';
         el.style.backgroundColor = '#51bbd6';
         
@@ -185,7 +171,6 @@ function Map({ onMarkerClick }) {
       // Añadir evento click
       el.addEventListener('click', (e) => {
         e.stopPropagation();
-        console.log("Marcador clickeado:", place);
         
         // Verificar el tipo de marcador
         if (place.tipo_marcador === 'foto_blog') {
@@ -198,7 +183,6 @@ function Map({ onMarkerClick }) {
               }
               
               const galeriaData = await response.json();
-              console.log("Datos de galería desde API:", galeriaData);
               
               const placeData = {
                 id: galeriaData.lugar.id,
@@ -228,8 +212,6 @@ function Map({ onMarkerClick }) {
               
               onMarkerClick(placeData);
             } catch (err) {
-              console.error("Error al cargar galería de entrada de blog:", err);
-              
               // Fallback usando los datos del marcador
               const placeData = {
                 id: place.lugar_id,
@@ -261,7 +243,6 @@ function Map({ onMarkerClick }) {
               }
               
               const lugarData = await response.json();
-              console.log("Datos del lugar desde API (lugar simple):", lugarData);
               
               // Preparar fotos para la galería (comportamiento original)
               const fotos = lugarData.fotografias || [];
@@ -290,8 +271,6 @@ function Map({ onMarkerClick }) {
               
               onMarkerClick(placeData);
             } catch (err) {
-              console.error("Error al cargar detalles del lugar:", err);
-              
               // Usar datos del marcador como fallback
               const placeData = {
                 id: place.id,

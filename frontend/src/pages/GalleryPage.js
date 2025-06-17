@@ -67,7 +67,7 @@ const GalleryPage = () => {
 
         setLugar(placeData);
       } catch (err) {
-        console.error('Error al cargar la galería:', err);
+        // Error al cargar la galería - mostrar mensaje de error
         setError(err.message);
       } finally {
         setLoading(false);
