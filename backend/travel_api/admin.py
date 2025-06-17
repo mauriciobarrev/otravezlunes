@@ -9,6 +9,10 @@ class LugarAdmin(admin.ModelAdmin):
     search_fields = ('nombre', 'ciudad', 'pais')
     list_filter = ('pais', 'ciudad')
 
+    def get_queryset(self, request):
+        # Mostrar todos los lugares (incluyendo los deshabilitados) en el admin
+        return Lugar.all_objects.all()
+
 @admin.register(Fotografia)
 class FotografiaAdmin(admin.ModelAdmin):
     list_display = ('uuid', 'lugar', 'entrada_blog', 'thumbnail_preview', 'autor_fotografia', 'fecha_toma', 'orden_en_entrada')
@@ -41,9 +45,15 @@ class FotografiaAdmin(admin.ModelAdmin):
         return "(No thumbnail)"
     thumbnail_preview_large.short_description = 'Vista Previa Miniatura'
 
+    def get_queryset(self, request):
+        return Fotografia.all_objects.select_related('lugar', 'entrada_blog')
+
 @admin.register(EntradaDeBlog)
 class EntradaDeBlogAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'autor', 'fecha_publicacion', 'lugar_asociado')
     list_filter = ('autor', 'fecha_publicacion', 'lugar_asociado')
     search_fields = ('titulo', 'contenido', 'autor__username', 'lugar_asociado__nombre')
     # Para el campo 'contenido' que podría ser Markdown, se podría integrar un editor de Markdown como `django-markdownx`.
+
+    def get_queryset(self, request):
+        return EntradaDeBlog.all_objects.select_related('autor', 'lugar_asociado')

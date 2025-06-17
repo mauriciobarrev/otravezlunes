@@ -3,8 +3,45 @@ from django.conf import settings # Para referenciar al User model
 import uuid # Add this import
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 
-class Lugar(models.Model):
+# -----------------------------------------------------------------------------
+# Gestión de estados activo / deshabilitado
+# -----------------------------------------------------------------------------
+
+
+class StatusChoices(models.TextChoices):
+    ACTIVE = 'active', _('Active')
+    DISABLED = 'disabled', _('Disabled')
+
+
+class StatusQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(status=StatusChoices.ACTIVE)
+
+
+class StatusManager(models.Manager):
+    def get_queryset(self):
+        # Por defecto solo elementos activos
+        return StatusQuerySet(self.model, using=self._db).filter(status=StatusChoices.ACTIVE)
+
+    def all_with_disabled(self):
+        return StatusQuerySet(self.model, using=self._db)
+
+
+class StatusModel(models.Model):
+    """Modelo abstracto que añade un campo 'status'."""
+
+    status = models.CharField(max_length=10, choices=StatusChoices.choices, default=StatusChoices.ACTIVE)
+
+    # Managers
+    objects = StatusManager()      # Solo activos
+    all_objects = models.Manager() # Todos
+
+    class Meta:
+        abstract = True
+
+class Lugar(StatusModel):
     nombre = models.CharField(max_length=255)
     pais = models.CharField(max_length=100, blank=True, null=True)
     ciudad = models.CharField(max_length=100, blank=True, null=True)
@@ -27,7 +64,7 @@ class Lugar(models.Model):
         verbose_name_plural = "Lugares"
         unique_together = ['latitud', 'longitud'] # No deberían existir dos lugares exactamente en el mismo punto.
 
-class Fotografia(models.Model):
+class Fotografia(StatusModel):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, help_text="Identificador único universal para la fotografía.")
     lugar = models.ForeignKey(Lugar, related_name='fotografias', on_delete=models.CASCADE)
     entrada_blog = models.ForeignKey('EntradaDeBlog', related_name='fotografias', on_delete=models.CASCADE, null=True, blank=True, help_text="Entrada de blog a la que pertenece esta fotografía.")
@@ -50,7 +87,7 @@ class Fotografia(models.Model):
     class Meta:
         ordering = ['entrada_blog', 'orden_en_entrada', '-fecha_toma']
 
-class EntradaDeBlog(models.Model):
+class EntradaDeBlog(StatusModel):
     titulo = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True, help_text="Descripción breve de la entrada de blog para mostrar en el hero.")
     lugar_asociado = models.ForeignKey(Lugar, related_name='entradas_blog', on_delete=models.SET_NULL, blank=True, null=True, help_text="Lugar principal al que se refiere esta entrada, si aplica.")
