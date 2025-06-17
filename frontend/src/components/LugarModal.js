@@ -149,6 +149,7 @@ const LugarModal = ({ lugar, onClose }) => {
               className={`gallery-photo ${imageLoaded ? 'loaded' : ''}`}
               onLoad={handleImageLoad}
               onError={handleImageError}
+              draggable={false}
             />
           )}
           

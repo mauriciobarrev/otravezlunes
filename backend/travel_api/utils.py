@@ -2,6 +2,10 @@ import markdown
 import bleach
 from markdown.extensions import codehilite, toc, tables, fenced_code, admonition
 import re
+import logging
+
+# Logger para el módulo
+logger = logging.getLogger(__name__)
 
 # Configuración de extensiones de Markdown
 MARKDOWN_EXTENSIONS = [
@@ -219,5 +223,6 @@ def create_thumbnail(image, size=(300, 300)):
         return thumbnail_file
         
     except Exception as e:
-        print(f"Error creando thumbnail: {e}")
+        # Usar logging para capturar el stacktrace sin exponer en consola en producción
+        logger.exception("Error creando thumbnail: %s", e)
         return None 

@@ -10,3 +10,6 @@ markdown>=3.5.0
 bleach>=6.0.0
 python-markdown-math>=0.8
 pymdown-extensions>=10.0
+
+# Seguridad adicional
+django-csp>=3.7

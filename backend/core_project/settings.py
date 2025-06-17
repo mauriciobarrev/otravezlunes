@@ -29,7 +29,12 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'a_default_fallback_secret_key_if_not_in_en
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS desde variables de entorno (separados por coma)
+env_allowed_hosts = os.getenv('ALLOWED_HOSTS', '')
+if env_allowed_hosts:
+    ALLOWED_HOSTS = [host.strip() for host in env_allowed_hosts.split(',') if host.strip()]
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1'] if DEBUG else []
 
 
 # Application definition
@@ -149,12 +154,39 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')  # Apunta a la carpeta media en la raíz del proyecto
 
-# Asegurarse de que DEBUG esté en True para desarrollo
-DEBUG = True
+# Configuración CORS – en producción restringir orígenes
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    env_cors_origins = os.getenv('CORS_ALLOWED_ORIGINS', '')
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = [o.strip() for o in env_cors_origins.split(',') if o.strip()]
 
-# Permitir todas las hosts para desarrollo
-ALLOWED_HOSTS = ['*']  # Apunta a la carpeta raíz del proyecto
+# Headers de seguridad para producción
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 año
+    SECURE_HSTS_PRELOAD = True
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    X_FRAME_OPTIONS = 'DENY'
 
-# Configuración CORS
-CORS_ALLOW_ALL_ORIGINS = True  # En producción, definir específicamente los orígenes permitidos
-CORS_ALLOW_CREDENTIALS = True
+# Content Security Policy (requiere django-csp)
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'", 'https://fonts.googleapis.com', "'unsafe-inline'")
+CSP_SCRIPT_SRC = ("'self'", 'https://api.mapbox.com', "'unsafe-inline'", "'unsafe-eval'")
+CSP_IMG_SRC = ("'self'", 'data:', 'https://api.mapbox.com')
+
+# Añadimos CSP a INSTALLED_APPS y MIDDLEWARE si está disponible
+try:
+    import csp
+    if 'csp' not in INSTALLED_APPS:
+        INSTALLED_APPS.append('csp')
+    if 'csp.middleware.CSPMiddleware' not in MIDDLEWARE:
+        # Insertar después de SecurityMiddleware
+        sec_index = MIDDLEWARE.index('django.middleware.security.SecurityMiddleware')
+        MIDDLEWARE.insert(sec_index + 1, 'csp.middleware.CSPMiddleware')
+except ImportError:
+    # django-csp no instalado, omitir sin romper la app
+    pass

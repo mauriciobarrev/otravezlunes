@@ -4,6 +4,10 @@ import uuid # Add this import
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
+import logging
+
+# Configurar logger para este módulo
+logger = logging.getLogger(__name__)
 
 # -----------------------------------------------------------------------------
 # Gestión de estados activo / deshabilitado
@@ -155,7 +159,8 @@ def generate_image_urls_and_thumbnail(sender, instance, created, **kwargs):
                     thumbnail_url=instance.thumbnail.url
                 )
         except Exception as e:
-            print(f"Error generando thumbnail: {e}")
+            # Registrar el error usando logging para evitar prints en producción
+            logger.exception("Error generando thumbnail: %s", e)
     
     # Actualizar URLs si no están establecidas
     if instance.imagen and not instance.url_imagen:

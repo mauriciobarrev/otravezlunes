@@ -2,8 +2,16 @@ import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import './Map.css';
 
-// Token de Mapbox
-mapboxgl.accessToken = 'pk.eyJ1IjoibWF1cmljaW9iYXJyZXYiLCJhIjoiY21hdTl3bG53MTVpMjJxb3Njd2xoM2VuMiJ9.piVsma3PVk8ZcTcy4fLEng';
+// El token de Mapbox ahora se obtiene desde variables de entorno para evitar exponerlo en el repositorio.
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN || '';
+
+if (!mapboxgl.accessToken) {
+  // Avisar solo en desarrollo
+  if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line no-console
+    console.warn('REACT_APP_MAPBOX_TOKEN no está definido. El mapa podría no funcionar correctamente.');
+  }
+}
 
 // Datos de ejemplo para usar en caso de fallo
 const photosDataFallback = [

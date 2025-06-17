@@ -149,11 +149,12 @@ const BlogEntryModal = ({ lugar, onClose }) => {
               },
               pre: ({ children }) => <pre className="blog-pre">{children}</pre>,
               img: ({ src, alt }) => (
-                <img 
-                  src={src} 
-                  alt={alt} 
-                  className="blog-image" 
+                <img
+                  src={src}
+                  alt={alt}
+                  className="blog-image"
                   loading="lazy"
+                  draggable={false}
                 />
               ),
               a: ({ href, children }) => (
