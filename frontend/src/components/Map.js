@@ -32,12 +32,96 @@ function Map({ onMarkerClick }) {
   const [map, setMap] = useState(null);
   const markersRef = useRef([]);
   
-  const [lng, setLng] = useState(-70.6444);
-  const [lat, setLat] = useState(-33.4423);
-  const [zoom, setZoom] = useState(3.5);
+  // Obtener estado guardado del localStorage o usar valores por defecto
+  const getInitialMapState = () => {
+    try {
+      const savedState = localStorage.getItem('mapState');
+      if (savedState) {
+        return JSON.parse(savedState);
+      }
+    } catch (error) {
+      console.warn('Error loading saved map state:', error);
+    }
+    
+    // Valores por defecto centrados en Sudamérica
+    return {
+      lng: -70.6444,
+      lat: -33.4423,
+      zoom: 3.5,
+      hasInitialFit: false
+    };
+  };
+
+  const initialState = getInitialMapState();
+  const [lng, setLng] = useState(initialState.lng);
+  const [lat, setLat] = useState(initialState.lat);
+  const [zoom, setZoom] = useState(initialState.zoom);
+  const [hasInitialFit, setHasInitialFit] = useState(initialState.hasInitialFit);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [places, setPlaces] = useState([]);
+
+  // Función para guardar el estado del mapa
+  const saveMapState = (newLng, newLat, newZoom) => {
+    try {
+      const mapState = {
+        lng: newLng,
+        lat: newLat,
+        zoom: newZoom,
+        hasInitialFit: true
+      };
+      localStorage.setItem('mapState', JSON.stringify(mapState));
+    } catch (error) {
+      console.warn('Error saving map state:', error);
+    }
+  };
+
+  // Función para calcular bounds que incluyan todos los marcadores
+  const fitBoundsToMarkers = (mapInstance, placesData) => {
+    if (!mapInstance || !placesData || placesData.length === 0) return;
+
+    try {
+      // Crear bounds object
+      const bounds = new mapboxgl.LngLatBounds();
+
+      // Añadir cada coordenada a los bounds
+      placesData.forEach(place => {
+        if (place.coordinates && place.coordinates.length === 2) {
+          bounds.extend(place.coordinates);
+        }
+      });
+
+      // Verificar que tenemos bounds válidos
+      if (!bounds.isEmpty()) {
+        // Hacer fit con padding para mejor visualización
+        mapInstance.fitBounds(bounds, {
+          padding: {
+            top: 50,
+            bottom: 50,
+            left: 50,
+            right: 50
+          },
+          maxZoom: 12, // Evitar zoom excesivo si los puntos están muy cerca
+          duration: 1000 // Animación suave
+        });
+        
+        // Marcar que ya se hizo el fit inicial
+        setHasInitialFit(true);
+        
+        // Guardar el estado después del fit (con un pequeño delay para que termine la animación)
+        setTimeout(() => {
+          const center = mapInstance.getCenter();
+          const newLng = Number(center.lng.toFixed(4));
+          const newLat = Number(center.lat.toFixed(4));
+          const newZoom = Number(mapInstance.getZoom().toFixed(2));
+          
+          saveMapState(newLng, newLat, newZoom);
+        }, 1100); // Ligeramente después de que termine la animación (1000ms)
+      }
+    } catch (error) {
+      console.warn('Error fitting bounds to markers:', error);
+    }
+  };
 
   // Efecto para cargar los datos de la API
   useEffect(() => {
@@ -84,16 +168,56 @@ function Map({ onMarkerClick }) {
         interactive: true // Asegurar que el mapa sea interactivo
       });
       
+      // Agregar controles de navegación (zoom +/-)
+      const navControl = new mapboxgl.NavigationControl({
+        showCompass: false, // Ocultar brújula, solo mostrar zoom
+        showZoom: true
+      });
+      mapInstance.addControl(navControl, 'bottom-right');
+      
+      // Agregar control de geolocalización
+      const geolocateControl = new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true
+        },
+        trackUserLocation: false, // No seguir automáticamente
+        showUserHeading: false,
+        showAccuracyCircle: true,
+        fitBoundsOptions: {
+          maxZoom: 15 // Zoom máximo cuando localiza al usuario
+        }
+      });
+      mapInstance.addControl(geolocateControl, 'bottom-right');
+      
       // Guardar la instancia del mapa en el estado
       setMap(mapInstance);
       
-      // Configurar eventos del mapa
+      // Configurar eventos del mapa para guardar estado
+      let moveTimeout;
       mapInstance.on('move', () => {
         const center = mapInstance.getCenter();
-        setLng(center.lng.toFixed(4));
-        setLat(center.lat.toFixed(4));
-        setZoom(mapInstance.getZoom().toFixed(2));
+        const newLng = Number(center.lng.toFixed(4));
+        const newLat = Number(center.lat.toFixed(4));
+        const newZoom = Number(mapInstance.getZoom().toFixed(2));
+        
+        setLng(newLng);
+        setLat(newLat);
+        setZoom(newZoom);
       });
+      
+      // Guardar estado cuando termine el movimiento (debounced)
+      mapInstance.on('moveend', () => {
+        clearTimeout(moveTimeout);
+        moveTimeout = setTimeout(() => {
+          const center = mapInstance.getCenter();
+          const newLng = Number(center.lng.toFixed(4));
+          const newLat = Number(center.lat.toFixed(4));
+          const newZoom = Number(mapInstance.getZoom().toFixed(2));
+          
+          saveMapState(newLng, newLat, newZoom);
+        }, 300); // Debounce de 300ms
+      });
+      
     } catch (err) {
       setError(`Error al inicializar mapa: ${err.message}`);
     }
@@ -177,7 +301,12 @@ function Map({ onMarkerClick }) {
           // Es un marcador individual de foto de entrada de blog
           (async () => {
             try {
-              const response = await fetch(`/api/entrada-blog-galeria/${place.entrada_id}/${place.foto_id}/`);
+              // Usar slug si está disponible, sino usar ID como fallback
+              const url = place.entrada_slug 
+                ? `/api/blog/${place.entrada_slug}/galeria/${place.foto_id}/`
+                : `/api/entrada-blog-galeria/${place.entrada_id}/${place.foto_id}/`;
+              
+              const response = await fetch(url);
               if (!response.ok) {
                 throw new Error(`Error al cargar la entrada de blog: ${response.status}`);
               }
@@ -192,6 +321,7 @@ function Map({ onMarkerClick }) {
                 description: galeriaData.lugar.descripcion || 'Sin descripción',
                 blogEntry: {
                   id: galeriaData.entrada.id,
+                  slug: galeriaData.entrada.slug,
                   title: galeriaData.entrada.titulo,
                   content: galeriaData.entrada.contenido_procesado || galeriaData.entrada.content || galeriaData.entrada.contenido_markdown,
                   contenido_procesado: galeriaData.entrada.contenido_procesado || galeriaData.entrada.content || galeriaData.entrada.contenido_markdown,
@@ -219,6 +349,11 @@ function Map({ onMarkerClick }) {
                 city: place.ciudad || '',
                 country: place.pais || '',
                 description: place.descripcion || 'Sin descripción',
+                blogEntry: place.entrada_slug ? {
+                  id: place.entrada_id,
+                  slug: place.entrada_slug,
+                  title: place.entrada_titulo
+                } : null,
                 activePhotoIndex: 0,
                 photos: [{
                   id: place.foto_id,
@@ -295,8 +430,12 @@ function Map({ onMarkerClick }) {
       });
     });
     
+    // Solo hacer auto-fit en la primera carga, no en recargas posteriores
+    if (!hasInitialFit && places.length > 0) {
+      fitBoundsToMarkers(map, places);
+    }
     
-  }, [map, places, onMarkerClick]);
+  }, [map, places, onMarkerClick, hasInitialFit]);
 
   // Función para procesar URLs de imágenes
   function processImageUrl(url) {
@@ -330,10 +469,6 @@ function Map({ onMarkerClick }) {
 
   return (
     <div className="map-wrapper">
-      <div className="sidebar">
-        Longitud: {lng} | Latitud: {lat} | Zoom: {zoom}
-      </div>
-      
       {error && (
         <div className="error-message">
           Error: {error}

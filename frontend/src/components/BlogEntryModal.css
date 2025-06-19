@@ -659,4 +659,73 @@ html {
   .blog-article {
     max-width: 100%;
   }
-} 
+}
+
+/* Clases específicas SOLO para títulos muy largos (>45 caracteres) */
+
+/* Overlay especial para títulos largos */
+.hero-overlay-long-title {
+  justify-content: center;
+  min-height: 70vh;
+  padding-top: 80px;
+  padding-bottom: 100px;
+}
+
+/* Título muy largo - ajustes especiales */
+.blog-title-very-long {
+  font-size: clamp(3rem, 10vw, 6rem) !important;
+  line-height: 0.95 !important;
+  letter-spacing: 0.8px !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* Media queries específicos para títulos largos */
+@media (min-width: 769px) and (max-width: 1440px) {
+  .hero-overlay-long-title {
+    min-height: 75vh;
+    padding-top: 100px;
+    padding-bottom: 120px;
+    max-width: 85%;
+  }
+  
+  .blog-title-very-long {
+    font-size: clamp(3.2rem, 9vw, 5.8rem) !important;
+    line-height: 0.92 !important;
+    margin-bottom: 2rem !important;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  /* Tablets - ajustes muy conservadores para títulos largos */
+  .hero-overlay-long-title {
+    min-height: 60vh;
+    padding-top: 40px;
+    padding-bottom: 60px;
+  }
+  
+  .blog-title-very-long {
+    font-size: clamp(3.2rem, 11vw, 6.5rem) !important;
+    line-height: 0.98 !important;
+    margin-bottom: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Móviles - mantener casi la escala original */
+  .hero-overlay-long-title {
+    min-height: 50vh;
+    padding-top: 20px;
+    padding-bottom: 40px;
+  }
+  
+  .blog-title-very-long {
+    /* En móviles, mantener tamaño muy cercano al original */
+    font-size: clamp(3.3rem, 11.5vw, 6.8rem) !important;
+    line-height: 0.99 !important;
+    margin-bottom: 0.8rem !important;
+  }
+}
+
+
+
+ 

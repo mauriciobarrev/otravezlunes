@@ -65,10 +65,41 @@ class FotografiaAdmin(admin.ModelAdmin):
 
 @admin.register(EntradaDeBlog)
 class EntradaDeBlogAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'autor', 'fecha_publicacion', 'lugar_asociado')
-    list_filter = ('autor', 'fecha_publicacion', 'lugar_asociado')
-    search_fields = ('titulo', 'contenido', 'autor__username', 'lugar_asociado__nombre')
-    # Para el campo 'contenido' que podría ser Markdown, se podría integrar un editor de Markdown como `django-markdownx`.
+    list_display = ('titulo', 'slug', 'autor', 'fecha_display_formatted', 'fecha_publicacion', 'lugar_asociado', 'mostrar_solo_mes_anio')
+    list_filter = ('autor', 'fecha_publicacion', 'lugar_asociado', 'mostrar_solo_mes_anio')
+    search_fields = ('titulo', 'slug', 'contenido', 'autor__username', 'lugar_asociado__nombre')
+    
+    fieldsets = (
+        ('Información Básica', {
+            'fields': ('titulo', 'slug', 'descripcion', 'lugar_asociado', 'autor')
+        }),
+        ('Configuración de Fecha', {
+            'fields': ('fecha_evento', 'mostrar_solo_mes_anio'),
+            'description': 'La fecha de evento es opcional. Si no se especifica, se usará la fecha de publicación. '
+                          'Marcar "mostrar solo mes/año" para mostrar formato como "mayo 2024" en lugar de "14 de mayo de 2024".'
+        }),
+        ('Contenido', {
+            'fields': ('contenido_markdown',),
+            'classes': ('wide',)
+        }),
+        ('Metadatos del Sistema', {
+            'fields': ('fecha_publicacion', 'contenido_html'),
+            'classes': ('collapse',),
+            'description': 'Campos automáticos del sistema. No editar manualmente.'
+        })
+    )
+    
+    readonly_fields = ('fecha_publicacion', 'contenido_html')
+    
+    def fecha_display_formatted(self, obj):
+        """Muestra la fecha como se verá en el frontend"""
+        fecha = obj.get_fecha_display()
+        if obj.get_mostrar_solo_mes_anio():
+            return fecha.strftime('%B %Y')  # "mayo 2024"
+        else:
+            return fecha.strftime('%d de %B de %Y')  # "14 de mayo de 2024"
+    fecha_display_formatted.short_description = 'Fecha de Visualización'
+    fecha_display_formatted.admin_order_field = 'fecha_evento'
 
     def get_queryset(self, request):
         return EntradaDeBlog.all_objects.select_related('autor', 'lugar_asociado')

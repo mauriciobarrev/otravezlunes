@@ -21,20 +21,24 @@ def main():
         epilog="""
 Ejemplos de uso:
 
-1. Cargar fotos a entrada existente (o crear automáticamente si no existe):
+1. Cargar fotos a entrada existente usando slug (RECOMENDADO):
+   python upload_photos.py ~/Pictures/Santiago_Chile --slug "santiago"
+   python upload_photos.py ~/Pictures/Tayrona_Fotos --slug "tayrona"
+
+2. Cargar fotos usando título de entrada (legacy):
    python upload_photos.py ~/Pictures/Santiago_Chile --blog "Mi Aventura en Santiago"
 
-2. Crear nueva entrada con lugar específico:
-   python upload_photos.py ./fotos_madrid --blog "Descubriendo Madrid" --place "Madrid"
+3. Crear nueva entrada con lugar específico:
+   python upload_photos.py ./fotos_madrid --blog "Descubriendo Madrid" --new --place "Madrid"
 
-3. Crear entrada con coordenadas específicas:
+4. Crear entrada con coordenadas específicas:
    python upload_photos.py ~/fotos/amsterdam --blog "Amsterdam Experience" --new --place "Amsterdam" --coords "52.3676,4.9041"
 
-4. Cargar a entrada existente por ID:
+5. Cargar a entrada existente por ID:
    python upload_photos.py ~/fotos/barcelona --id 5
 
-5. Forzar sobreescribir fotos existentes:
-   python upload_photos.py ~/fotos/roma --blog "Roma Eterna" --force
+6. Forzar sobreescribir fotos existentes:
+   python upload_photos.py ~/fotos/roma --slug "roma" --force
         """
     )
     
@@ -46,6 +50,10 @@ Ejemplos de uso:
     
     # Opciones de entrada de blog
     group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        '--slug', '-s',
+        help='Slug de la entrada de blog (ej: "catedral-colonia", "buenos-aires")'
+    )
     group.add_argument(
         '--blog', '-b',
         help='Título de la entrada de blog (busca existente o crea nueva con --new)'
@@ -103,7 +111,7 @@ Ejemplos de uso:
         print(f"❌ Error: '{folder_path}' no es una carpeta")
         sys.exit(1)
     
-    if args.new and args.blog and not args.place:
+    if args.new and (args.blog or args.slug) and not args.place:
         print("❌ Error: Se requiere --place para crear una nueva entrada de blog")
         sys.exit(1)
     
@@ -125,6 +133,8 @@ Ejemplos de uso:
     # Agregar opciones de entrada de blog
     if args.id:
         cmd.extend(['--blog-entry-id', str(args.id)])
+    elif args.slug:
+        cmd.extend(['--blog-slug', args.slug])
     elif args.blog:
         cmd.extend(['--blog-title', args.blog])
         # Siempre permitir creación si no existe
@@ -148,7 +158,9 @@ Ejemplos de uso:
     # Información previa
     print("🚀 Iniciando carga de fotos...")
     print(f"📁 Carpeta: {folder_path}")
-    if args.blog:
+    if args.slug:
+        print(f"📝 Slug de entrada: {args.slug}")
+    elif args.blog:
         print(f"📝 Blog: {args.blog}")
         if args.new:
             print("✨ Se creará nueva entrada si no existe")

@@ -8,19 +8,55 @@ import './BlogEntryModal.css';
 const BlogEntryModal = ({ lugar, onClose }) => {
   const [heroOpacity, setHeroOpacity] = useState(1);
 
-  // Fade-out hero while scrolling
   useEffect(() => {
     // Reset scroll to top so hero is visible
     window.scrollTo({ top: 0, left: 0 });
 
-    const onScroll = () => {
-      const progress = Math.min(window.scrollY / (window.innerHeight * 0.6), 1);
-      setHeroOpacity(1 - progress);
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const fadeStart = windowHeight * 0.3;
+      const fadeEnd = windowHeight * 0.8;
+      
+      if (scrollY <= fadeStart) {
+        setHeroOpacity(1);
+      } else if (scrollY >= fadeEnd) {
+        setHeroOpacity(0);
+      } else {
+        const range = fadeEnd - fadeStart;
+        const progress = (scrollY - fadeStart) / range;
+        setHeroOpacity(1 - progress);
+      }
     };
-    
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Función para detectar títulos muy largos que necesitan ajustes especiales
+  const isVeryLongTitle = (title) => {
+    if (!title) return false;
+    // Solo para títulos realmente largos (más de 45 caracteres)
+    // Como "PARQUE NACIONAL NATURAL TAYRONA: EL PARAÍSO EN LA TIERRA" (54 chars)
+    return title.length > 45;
+  };
+
+  // Función para obtener clases CSS apropiadas
+  const getHeroOverlayClasses = (title) => {
+    let classes = 'hero-overlay';
+    if (isVeryLongTitle(title)) {
+      classes += ' hero-overlay-long-title';
+    }
+    return classes;
+  };
+
+  const getTitleClasses = (title) => {
+    let classes = 'blog-title';
+    if (isVeryLongTitle(title)) {
+      classes += ' blog-title-very-long';
+    }
+    return classes;
+  };
 
   // Lazy fade-in of every feed image
   useEffect(() => {
@@ -72,6 +108,43 @@ const BlogEntryModal = ({ lugar, onClose }) => {
 
   const firstPhoto = lugar.photos[0];
 
+  // Función para formatear fechas inteligentemente
+  const formatDisplayDate = (dateString, showOnlyMonthYear = false) => {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    
+    if (showOnlyMonthYear) {
+      // Formato: "mayo 2024"
+      return date.toLocaleDateString('es-ES', {
+        month: 'long',
+        year: 'numeric'
+      }).toUpperCase();
+    } else {
+      // Formato: "17 JUN 2025"
+      return date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }).toUpperCase();
+    }
+  };
+
+  // Función para obtener la fecha a mostrar (prioriza fecha_display si existe)
+  const getDateToDisplay = (blogEntry) => {
+    if (!blogEntry) return null;
+    
+    // Usar fecha_display si está disponible, sino usar date como fallback
+    const dateString = blogEntry.fecha_display || blogEntry.date;
+    const showOnlyMonthYear = blogEntry.mostrar_solo_mes_anio || false;
+    
+    return {
+      dateString,
+      showOnlyMonthYear,
+      formatted: formatDisplayDate(dateString, showOnlyMonthYear)
+    };
+  };
+
   return (
     <div className="modal-backdrop">
       {/* Top Navigation */}
@@ -82,14 +155,14 @@ const BlogEntryModal = ({ lugar, onClose }) => {
       </nav>
 
       {/* HERO */}
-      <section className="blog-hero" style={{ opacity: heroOpacity }}>
-        <div className="hero-overlay">
-          <h1 className="blog-title">{lugar.blogEntry?.title || lugar.name}</h1>
-          {lugar.blogEntry?.description && (
-            <p className="blog-description">
-              {lugar.blogEntry.description}
-            </p>
-          )}
+                      <section className="blog-hero" style={{ opacity: heroOpacity }}>
+          <div className={getHeroOverlayClasses(lugar.blogEntry?.title || lugar.name)}>
+            <h1 className={getTitleClasses(lugar.blogEntry?.title || lugar.name)}>{lugar.blogEntry?.title || lugar.name}</h1>
+           {lugar.blogEntry?.description && (
+             <p className="blog-description">
+               {lugar.blogEntry.description}
+             </p>
+           )}
         </div>
         
         {/* Scroll indicator */}
@@ -97,11 +170,7 @@ const BlogEntryModal = ({ lugar, onClose }) => {
           <div className="scroll-indicator" style={{ opacity: heroOpacity * 0.7 }}>
             <div className="scroll-arrow"></div>
             <span className="scroll-date">
-              {new Date(lugar.blogEntry.date).toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-              }).toUpperCase()}
+              {getDateToDisplay(lugar.blogEntry)?.formatted}
             </span>
           </div>
         )}

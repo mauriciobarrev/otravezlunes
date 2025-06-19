@@ -22,6 +22,7 @@ class FotografiaSerializer(serializers.ModelSerializer):
     # Información de la entrada de blog
     entrada_blog_titulo = serializers.CharField(source='entrada_blog.titulo', read_only=True)
     entrada_blog_id = serializers.IntegerField(source='entrada_blog.id', read_only=True)
+    entrada_blog_slug = serializers.CharField(source='entrada_blog.slug', read_only=True)
     
     # URLs absolutas para las imágenes
     imagen_url = serializers.SerializerMethodField()
@@ -32,7 +33,7 @@ class FotografiaSerializer(serializers.ModelSerializer):
         model = Fotografia
         fields = [
             'id', 'uuid', 'lugar', 'lugar_nombre', 'lugar_ciudad', 'lugar_pais',
-            'entrada_blog', 'entrada_blog_titulo', 'entrada_blog_id', 'orden_en_entrada',
+            'entrada_blog', 'entrada_blog_titulo', 'entrada_blog_id', 'entrada_blog_slug', 'orden_en_entrada',
             'imagen_url', 'thumbnail_url_absoluta', 'imagen_alta_calidad_url', 'autor_fotografia', 'fecha_toma',
             'descripcion', 'palabras_clave', 'coordenadas', 'direccion_captura'
         ]
@@ -96,11 +97,16 @@ class EntradaDeBlogConFotosSerializer(serializers.ModelSerializer):
     contenido_procesado = serializers.CharField(source='contenido_html', read_only=True)
     extracto = serializers.SerializerMethodField()
     
+    # Campos para fechas flexibles
+    fecha_display = serializers.SerializerMethodField()
+    mostrar_solo_mes_anio = serializers.BooleanField(read_only=True)
+    
     class Meta:
         model = EntradaDeBlog
         fields = [
-            'id', 'titulo', 'descripcion', 'lugar_asociado', 'lugar_asociado_info',
-            'fecha_publicacion', 'autor', 'autor_info', 'contenido_markdown', 
+            'id', 'slug', 'titulo', 'descripcion', 'lugar_asociado', 'lugar_asociado_info',
+            'fecha_publicacion', 'fecha_evento', 'fecha_display', 'mostrar_solo_mes_anio',
+            'autor', 'autor_info', 'contenido_markdown', 
             'contenido_procesado', 'extracto', 'fotografias'
         ]
     
@@ -108,6 +114,10 @@ class EntradaDeBlogConFotosSerializer(serializers.ModelSerializer):
         """Genera un extracto del contenido"""
         from .utils import extract_excerpt
         return extract_excerpt(obj.contenido_markdown, max_length=200)
+    
+    def get_fecha_display(self, obj):
+        """Retorna la fecha formateada según la configuración"""
+        return obj.get_fecha_display().isoformat()
 
 class LugarDetalleSerializer(serializers.ModelSerializer):
     """Serializer para mostrar un lugar con todas sus entradas de blog y fotografías"""
@@ -126,16 +136,24 @@ class EntradaDeBlogSerializer(serializers.ModelSerializer):
     lugar_asociado_info = LugarSerializer(source='lugar_asociado', read_only=True)
     contenido_procesado = serializers.CharField(source='contenido_html', read_only=True)
     extracto = serializers.SerializerMethodField()
+    
+    # Campos para fechas flexibles
+    fecha_display = serializers.SerializerMethodField()
+    mostrar_solo_mes_anio = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = EntradaDeBlog
         fields = [
             'id',
+            'slug',
             'titulo',
             'descripcion',
             'lugar_asociado', # FK
             'lugar_asociado_info',
             'fecha_publicacion',
+            'fecha_evento',
+            'fecha_display',
+            'mostrar_solo_mes_anio',
             'autor', # FK
             'autor_info',
             'contenido_markdown',
@@ -147,4 +165,8 @@ class EntradaDeBlogSerializer(serializers.ModelSerializer):
     def get_extracto(self, obj):
         """Genera un extracto del contenido"""
         from .utils import extract_excerpt
-        return extract_excerpt(obj.contenido_markdown, max_length=150) 
+        return extract_excerpt(obj.contenido_markdown, max_length=150)
+    
+    def get_fecha_display(self, obj):
+        """Retorna la fecha formateada según la configuración"""
+        return obj.get_fecha_display().isoformat() 

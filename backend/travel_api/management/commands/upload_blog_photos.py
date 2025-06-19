@@ -27,6 +27,7 @@ class Command(BaseCommand):
     
     Uso:
     python manage.py upload_blog_photos --source-folder "/ruta/a/las/fotos" --blog-entry-id 1
+    python manage.py upload_blog_photos --source-folder "/Users/mauro/Fotos/Santiago_Chile" --blog-slug "santiago"
     python manage.py upload_blog_photos --source-folder "/Users/mauro/Fotos/Santiago_Chile" --blog-title "Mi Aventura en Santiago"
     python manage.py upload_blog_photos --source-folder "./fotos_temp/Madrid_2024" --create-blog --place-name "Madrid" --blog-title "Descubriendo Madrid"
     """
@@ -50,6 +51,12 @@ class Command(BaseCommand):
             '--blog-title',
             type=str,
             help='Título de la entrada de blog (busca por título o crea nueva si se usa con --create-blog)'
+        )
+        
+        parser.add_argument(
+            '--blog-slug',
+            type=str,
+            help='Slug de la entrada de blog (más preciso que el título, ej: "catedral-colonia")'
         )
         
         # Opciones para crear nueva entrada
@@ -185,7 +192,14 @@ class Command(BaseCommand):
             except EntradaDeBlog.DoesNotExist:
                 raise CommandError(f"No existe entrada de blog con ID {options['blog_entry_id']}")
         
-        # Opción 2: Buscar por título
+        # Opción 2: Buscar por slug (más preciso)
+        if options['blog_slug']:
+            try:
+                return EntradaDeBlog.objects.get(slug=options['blog_slug'])
+            except EntradaDeBlog.DoesNotExist:
+                raise CommandError(f"No existe entrada de blog con slug '{options['blog_slug']}'")
+        
+        # Opción 3: Buscar por título (legacy)
         if options['blog_title']:
             entrada = EntradaDeBlog.objects.filter(titulo=options['blog_title']).first()
             if entrada:

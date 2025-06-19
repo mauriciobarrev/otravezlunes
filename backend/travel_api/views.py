@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from .models import Lugar, Fotografia, EntradaDeBlog
@@ -103,6 +103,7 @@ def mapa_data(request):
                         'id': f"{lugar.id}-{entrada.id}-{foto.id}",  # ID único combinado
                         'lugar_id': lugar.id,
                         'entrada_id': entrada.id,
+                        'entrada_slug': entrada.slug,
                         'foto_id': foto.id,
                         'coordinates': [float(lugar.longitud), float(lugar.latitud)],
                         'nombre': lugar.nombre,
@@ -200,7 +201,90 @@ def entrada_blog_galeria(request, entrada_id, foto_id=None):
                 'contenido_procesado': entrada.contenido_html or entrada.contenido_markdown,
                 'contenido_markdown': entrada.contenido_markdown,
                 'content': entrada.contenido_html or entrada.contenido_markdown,  # Compatibilidad
-                'fecha_publicacion': entrada.fecha_publicacion.strftime('%Y-%m-%d %H:%M:%S')
+                'fecha_publicacion': entrada.fecha_publicacion.strftime('%Y-%m-%d %H:%M:%S'),
+                'fecha_display': entrada.get_fecha_display().isoformat(),
+                'mostrar_solo_mes_anio': entrada.get_mostrar_solo_mes_anio()
+            },
+            'fotos': fotos_data,
+            'foto_activa_index': foto_activa_index
+        }
+        
+        return Response(response_data)
+        
+    except EntradaDeBlog.DoesNotExist:
+        return Response({'error': 'Entrada de blog no encontrada'}, status=404)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def entrada_blog_por_slug(request, slug):
+    """
+    Endpoint para obtener una entrada de blog específica por su slug.
+    GET /api/blog/{slug}/ - Obtiene la entrada de blog con el slug especificado
+    """
+    entrada = get_object_or_404(EntradaDeBlog, slug=slug)
+    
+    # Usar el serializer detallado que incluye las fotografías
+    serializer = EntradaDeBlogConFotosSerializer(entrada, context={'request': request})
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def entrada_blog_galeria_por_slug(request, slug, foto_id=None):
+    """
+    Endpoint para obtener datos completos de una entrada de blog por slug con su galería.
+    Si se especifica foto_id, devuelve el índice de esa foto para abrir la galería en esa posición.
+    """
+    try:
+        entrada = EntradaDeBlog.objects.get(slug=slug)
+        lugar = entrada.lugar_asociado
+        
+        # Obtener todas las fotos de esta entrada, ordenadas
+        fotos_entrada = entrada.fotografias.all().order_by('orden_en_entrada')
+        
+        # Determinar el índice de la foto activa
+        foto_activa_index = 0
+        if foto_id:
+            try:
+                foto_activa = fotos_entrada.get(id=foto_id)
+                foto_activa_index = list(fotos_entrada).index(foto_activa)
+            except Fotografia.DoesNotExist:
+                pass  # Usar índice 0 por defecto
+        
+        # Preparar datos de las fotos
+        fotos_data = []
+        for foto in fotos_entrada:
+            foto_data = {
+                'id': foto.id,
+                'uuid': str(foto.uuid),
+                'url': foto.url_imagen,
+                'thumbnail': foto.thumbnail_url,
+                'caption': foto.descripcion,
+                'description': foto.descripcion,
+                'date': foto.fecha_toma.strftime('%Y-%m-%d') if foto.fecha_toma else None,
+                'orden': foto.orden_en_entrada
+            }
+            fotos_data.append(foto_data)
+        
+        # Preparar respuesta
+        response_data = {
+            'lugar': {
+                'id': lugar.id,
+                'nombre': lugar.nombre,
+                'ciudad': lugar.ciudad,
+                'pais': lugar.pais,
+                'descripcion': lugar.descripcion_corta
+            },
+            'entrada': {
+                'id': entrada.id,
+                'slug': entrada.slug,
+                'titulo': entrada.titulo,
+                'descripcion': entrada.descripcion,
+                'contenido_procesado': entrada.contenido_html or entrada.contenido_markdown,
+                'contenido_markdown': entrada.contenido_markdown,
+                'content': entrada.contenido_html or entrada.contenido_markdown,  # Compatibilidad
+                'fecha_publicacion': entrada.fecha_publicacion.strftime('%Y-%m-%d %H:%M:%S'),
+                'fecha_display': entrada.get_fecha_display().isoformat(),
+                'mostrar_solo_mes_anio': entrada.get_mostrar_solo_mes_anio()
             },
             'fotos': fotos_data,
             'foto_activa_index': foto_activa_index

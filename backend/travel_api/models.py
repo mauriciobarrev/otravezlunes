@@ -4,6 +4,7 @@ import uuid # Add this import
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
+from django.utils.text import slugify
 import logging
 
 # Configurar logger para este módulo
@@ -98,18 +99,49 @@ class EntradaDeBlog(StatusModel):
     # Se podrían asociar múltiples lugares a una entrada de blog con un ManyToManyField si fuera necesario.
     # lugares = models.ManyToManyField(Lugar, related_name='entradas_blog_asociadas', blank=True)
     fecha_publicacion = models.DateTimeField(auto_now_add=True)
+    
+    # Campos flexibles para fechas de visualización
+    fecha_evento = models.DateField(blank=True, null=True, help_text="Fecha del evento/viaje. Si no se especifica día, usar el primer día del mes.")
+    mostrar_solo_mes_anio = models.BooleanField(default=False, help_text="Si está marcado, solo se mostrará 'mes año' (ej: 'mayo 2024'). Si no, se mostrará la fecha completa.")
+    
     autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     contenido_markdown = models.TextField(blank=True, null=True, help_text="Contenido en formato Markdown. Soporta títulos, negritas, cursivas, enlaces, listas, código, etc.")
     contenido_html = models.TextField(blank=True, null=True, help_text="Contenido convertido automáticamente a HTML desde Markdown. No editar manualmente.")
     # Campo temporal para migración - mantener compatibilidad
     contenido = models.TextField(blank=True, null=True, help_text="Campo temporal para migración. Usar contenido_markdown.")
-    # Podríamos añadir un campo slug para URLs amigables
-    # slug = models.SlugField(max_length=255, unique=True, blank=True)
+    # Campo slug para URLs amigables
+    slug = models.SlugField(max_length=255, unique=True, null=True, blank=True, help_text="URL amigable generada automáticamente desde el título. Ej: catedral-colonia")
     
     # Mantener compatibilidad temporal con el campo anterior
     def get_contenido_procesado(self):
         """Retorna el contenido HTML procesado, priorizando contenido_html"""
         return self.contenido_html or self.contenido_markdown or self.contenido or ""
+    
+    def get_fecha_display(self):
+        """Retorna la fecha a mostrar según la configuración"""
+        if self.fecha_evento:
+            return self.fecha_evento
+        return self.fecha_publicacion.date()
+    
+    def get_mostrar_solo_mes_anio(self):
+        """Retorna True si se debe mostrar solo mes y año"""
+        return self.mostrar_solo_mes_anio
+    
+    def generate_slug(self):
+        """Genera un slug único desde el título"""
+        if not self.titulo:
+            return ""
+        
+        base_slug = slugify(self.titulo)
+        slug = base_slug
+        counter = 1
+        
+        # Asegurar que el slug sea único
+        while EntradaDeBlog.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+        
+        return slug
 
     def __str__(self):
         return self.titulo
@@ -118,17 +150,21 @@ class EntradaDeBlog(StatusModel):
         ordering = ['-fecha_publicacion']
         verbose_name_plural = "Entradas de Blog"
 
-# Signal para auto-convertir Markdown a HTML
+# Signal para auto-convertir Markdown a HTML y generar slug
 @receiver(pre_save, sender=EntradaDeBlog)
 def convert_markdown_to_html(sender, instance, **kwargs):
     """
     Signal que convierte automáticamente el contenido Markdown a HTML
-    antes de guardar la entrada de blog.
+    y genera el slug antes de guardar la entrada de blog.
     """
     from .utils import markdown_to_html
     
     if instance.contenido_markdown:
         instance.contenido_html = markdown_to_html(instance.contenido_markdown)
+    
+    # Generar slug automáticamente si no existe
+    if not instance.slug and instance.titulo:
+        instance.slug = instance.generate_slug()
 
 # Signal para auto-generar URLs y thumbnails de fotografías
 from django.db.models.signals import post_save

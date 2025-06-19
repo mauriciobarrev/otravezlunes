@@ -9,6 +9,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/blog/:slug" element={<GalleryPage />} />
+        {/* Mantener ruta antigua por compatibilidad */}
         <Route path="/p/:entradaId" element={<GalleryPage />} />
       </Routes>
     </Router>

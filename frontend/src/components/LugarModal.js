@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './LugarModal.css'; // Crearemos este archivo CSS después
 
-const LugarModal = ({ lugar, onClose }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+const LugarModal = ({ lugar, activePhotoIndex, onClose, onNavigate }) => {
+  const [currentIndex, setCurrentIndex] = useState(activePhotoIndex || 0);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [errorLoading, setErrorLoading] = useState(false);
   const [imageOpacity, setImageOpacity] = useState(1);
@@ -124,6 +124,43 @@ const LugarModal = ({ lugar, onClose }) => {
     setImageLoaded(false);
   };
 
+  // Función para formatear fechas inteligentemente
+  const formatDisplayDate = (dateString, showOnlyMonthYear = false) => {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    
+    if (showOnlyMonthYear) {
+      // Formato: "mayo de 2024"
+      return date.toLocaleDateString('es-ES', {
+        month: 'long',
+        year: 'numeric'
+      });
+    } else {
+      // Formato: "14 de mayo de 2024"
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+  };
+
+  // Función para obtener la fecha a mostrar
+  const getDateToDisplay = (blogEntry) => {
+    if (!blogEntry) return null;
+    
+    // Usar fecha_display si está disponible, sino usar date como fallback
+    const dateString = blogEntry.fecha_display || blogEntry.date;
+    const showOnlyMonthYear = blogEntry.mostrar_solo_mes_anio || false;
+    
+    return {
+      dateString,
+      showOnlyMonthYear,
+      formatted: formatDisplayDate(dateString, showOnlyMonthYear)
+    };
+  };
+
   return (
     <div className="modal-backdrop"> {/* Remove onClick since this is now a full page */}
       <div className="gallery-modal-content" onClick={handleModalContentClick}>
@@ -172,13 +209,9 @@ const LugarModal = ({ lugar, onClose }) => {
           {lugar.blogEntry && (
             <div className="blog-entry-info">
               <h2 className="blog-title">{lugar.blogEntry.title}</h2>
-              {lugar.blogEntry.date && (
+              {getDateToDisplay(lugar.blogEntry) && (
                 <p className="blog-date">
-                  {new Date(lugar.blogEntry.date).toLocaleDateString('es-ES', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
+                  {getDateToDisplay(lugar.blogEntry).formatted}
                 </p>
               )}
               <div className="blog-content">

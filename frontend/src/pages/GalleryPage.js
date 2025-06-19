@@ -17,7 +17,7 @@ function processImageUrl(url) {
 }
 
 const GalleryPage = () => {
-  const { entradaId } = useParams();
+  const { entradaId, slug } = useParams(); // Extraer tanto entradaId como slug
   const [searchParams] = useSearchParams();
   const initialFotoId = searchParams.get('foto');
 
@@ -30,9 +30,23 @@ const GalleryPage = () => {
     async function fetchGallery() {
       try {
         setLoading(true);
-        const endpoint = initialFotoId
-          ? `/api/entrada-blog-galeria/${entradaId}/${initialFotoId}/`
-          : `/api/entrada-blog-galeria/${entradaId}/`;        
+        
+        // Determinar si usar slug o ID
+        let endpoint;
+        if (slug) {
+          // Usar la nueva URL con slug
+          endpoint = initialFotoId
+            ? `/api/blog/${slug}/galeria/${initialFotoId}/`
+            : `/api/blog/${slug}/galeria/`;
+        } else if (entradaId) {
+          // Usar la URL antigua con ID (para compatibilidad)
+          endpoint = initialFotoId
+            ? `/api/entrada-blog-galeria/${entradaId}/${initialFotoId}/`
+            : `/api/entrada-blog-galeria/${entradaId}/`;
+        } else {
+          throw new Error('No se proporcionó ni slug ni ID de entrada');
+        }
+        
         const response = await fetch(endpoint);
         if (!response.ok) {
           throw new Error(`Error HTTP: ${response.status}`);
@@ -51,7 +65,9 @@ const GalleryPage = () => {
             description: galeriaData.entrada.descripcion,
             contenido_procesado: galeriaData.entrada.contenido_procesado || galeriaData.entrada.content,
             content: galeriaData.entrada.content || galeriaData.entrada.contenido_procesado,
-            date: galeriaData.entrada.fecha_publicacion
+            date: galeriaData.entrada.fecha_publicacion,
+            fecha_display: galeriaData.entrada.fecha_display,
+            mostrar_solo_mes_anio: galeriaData.entrada.mostrar_solo_mes_anio
           },
           activePhotoIndex: galeriaData.foto_activa_index,
           photos: galeriaData.fotos.map(foto => ({
@@ -75,7 +91,7 @@ const GalleryPage = () => {
     }
 
     fetchGallery();
-  }, [entradaId, initialFotoId]);
+  }, [entradaId, slug, initialFotoId]);
 
   const handleClose = () => {
     navigate('/');
