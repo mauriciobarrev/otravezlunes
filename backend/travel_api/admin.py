@@ -25,7 +25,12 @@ class FotografiaAdmin(admin.ModelAdmin):
         if obj.imagen:
             return format_html('<img src="{}" width="400" height="auto" />', obj.imagen.url)
         elif obj.url_imagen:
-            return format_html('<img src="{}" width="400" height="auto" />', obj.url_imagen)
+            # Construir URL completa para imágenes
+            if obj.url_imagen.startswith('photos/'):
+                image_full_url = f"/media/{obj.url_imagen}"
+            else:
+                image_full_url = obj.url_imagen
+            return format_html('<img src="{}" width="400" height="auto" />', image_full_url)
         return "(No image)"
     image_preview.short_description = 'Vista Previa Imagen'
 
@@ -33,7 +38,12 @@ class FotografiaAdmin(admin.ModelAdmin):
         if obj.thumbnail:
             return format_html('<img src="{}" width="70" height="auto" />', obj.thumbnail.url)
         elif obj.thumbnail_url:
-            return format_html('<img src="{}" width="70" height="auto" />', obj.thumbnail_url)
+            # Construir URL completa para thumbnails
+            if obj.thumbnail_url.startswith('photos/'):
+                thumbnail_full_url = f"/media/{obj.thumbnail_url}"
+            else:
+                thumbnail_full_url = obj.thumbnail_url
+            return format_html('<img src="{}" width="70" height="auto" />', thumbnail_full_url)
         return "(No thumbnail)"
     thumbnail_preview.short_description = 'Miniatura'
 
@@ -41,7 +51,12 @@ class FotografiaAdmin(admin.ModelAdmin):
         if obj.thumbnail:
             return format_html('<img src="{}" width="300" height="auto" />', obj.thumbnail.url)
         elif obj.thumbnail_url:
-            return format_html('<img src="{}" width="300" height="auto" />', obj.thumbnail_url)
+            # Construir URL completa para thumbnails
+            if obj.thumbnail_url.startswith('photos/'):
+                thumbnail_full_url = f"/media/{obj.thumbnail_url}"
+            else:
+                thumbnail_full_url = obj.thumbnail_url
+            return format_html('<img src="{}" width="300" height="auto" />', thumbnail_full_url)
         return "(No thumbnail)"
     thumbnail_preview_large.short_description = 'Vista Previa Miniatura'
 

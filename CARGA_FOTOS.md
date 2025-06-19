@@ -97,6 +97,10 @@ python upload_photos.py ~/Pictures/Santiago_Chile_2024 \
   --description "Explorando la hermosa capital chilena"
 ```
 
+**Nota**: Las fotos se cargarán automáticamente con:
+- 📅 **Fecha de toma**: Extraída de metadatos EXIF de cada imagen
+- 👤 **Autor**: `mauribarrev` (configurado por defecto)
+
 ### Escenario 2: Agregar más fotos a una entrada existente
 
 ```bash
@@ -121,6 +125,35 @@ python upload_photos.py ~/Pictures/Roma_Nuevas \
   --blog "Roma Eterna" \
   --force
 ```
+
+## 🖼️ Gestión de Thumbnails
+
+### Generar Thumbnails Automáticamente
+
+```bash
+# Generar thumbnails faltantes
+python generate_thumbnails.py
+
+# Regenerar todos los thumbnails
+python generate_thumbnails.py --force
+
+# Solo para una entrada específica
+python generate_thumbnails.py --entry 8
+```
+
+### Si no aparecen las miniaturas en el admin:
+
+1. **Verificar que los thumbnails existen**:
+   ```bash
+   ls media/photos/thumbnails/
+   ```
+
+2. **Regenerar thumbnails**:
+   ```bash
+   python generate_thumbnails.py --force
+   ```
+
+3. **Refrescar la página del admin** después de regenerar
 
 ## 🔧 Solución de Problemas
 
@@ -163,6 +196,24 @@ Una vez cargadas las fotos, puedes:
 2. **Revisar la API**: `http://localhost:8000/api/entradas-blog/`
 3. **Ver en el mapa**: Abrir el frontend y buscar los nuevos marcadores
 
+## 📊 Información Extraída Automáticamente
+
+El script extrae automáticamente los siguientes datos de cada imagen:
+
+### 📅 **Fecha de Toma**
+- **Fuente principal**: Metadatos EXIF (`DateTimeOriginal`, `DateTimeDigitized`, `DateTime`)
+- **Respaldo**: Fecha de modificación del archivo
+- **Formato**: Detecta múltiples formatos de fecha automáticamente
+
+### 👤 **Autor**
+- **Por defecto**: `mauribarrev`
+- **Configurable**: Se puede modificar en el código si necesitas otro autor
+
+### 🖼️ **Thumbnails**
+- **Generación automática**: Se crean thumbnails de 300x300px
+- **Optimización**: JPEG con calidad 85% y optimización activada
+- **Formatos soportados**: JPG, JPEG, PNG, TIFF, RAW
+
 ## 🎯 Consejos de Uso
 
 1. **Nombres descriptivos**: Usa nombres de carpeta descriptivos como `Madrid_Abril_2024` en lugar de `Fotos_001`
@@ -176,7 +227,7 @@ Una vez cargadas las fotos, puedes:
    03_primera_caminata.jpg
    ```
 
-4. **Tamaño de archivos**: El script maneja automáticamente la creación de thumbnails, no necesitas redimensionar previamente
+4. **Metadatos EXIF**: Asegúrate de que tus fotos mantengan los metadatos EXIF para mejor extracción de fecha
 
 5. **Backup**: Siempre mantén una copia de seguridad de tus fotos originales antes de procesarlas
 

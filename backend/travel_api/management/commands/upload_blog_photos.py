@@ -14,6 +14,13 @@ import shutil
 from travel_api.models import Lugar, EntradaDeBlog, Fotografia
 from travel_api.utils import create_thumbnail
 
+# Intentar importar exifread para mejor extracción de metadatos
+try:
+    import exifread
+    EXIFREAD_AVAILABLE = True
+except ImportError:
+    EXIFREAD_AVAILABLE = False
+
 class Command(BaseCommand):
     help = """
     Carga fotos de una carpeta específica para una entrada de blog.
@@ -296,6 +303,7 @@ class Command(BaseCommand):
                 url_imagen=imagen_url,
                 thumbnail_url=thumbnail_url,
                 descripcion=metadata.get('description', f"Fotografía en {entrada_blog.lugar_asociado.nombre}"),
+                autor_fotografia=metadata.get('author', 'mauribarrev'),
                 fecha_toma=metadata.get('date_taken'),
                 orden_en_entrada=orden,
                 direccion_captura=metadata.get('location_description', '')
@@ -309,28 +317,71 @@ class Command(BaseCommand):
 
     def _extract_metadata(self, image_file):
         """Extrae metadatos de la imagen"""
-        metadata = {}
+        metadata = {
+            'author': 'mauribarrev',  # Autor por defecto
+            'description': image_file.stem.replace('_', ' ').replace('-', ' ').title()
+        }
         
-        try:
-            with Image.open(image_file) as img:
-                # Extraer EXIF
-                exif = img._getexif()
-                if exif:
-                    # Fecha de toma
-                    for tag, value in exif.items():
-                        decoded = ExifTags.TAGS.get(tag, tag)
-                        if decoded == 'DateTime':
+        # Intentar extraer fecha con exifread (más robusto)
+        if EXIFREAD_AVAILABLE:
+            try:
+                with open(image_file, 'rb') as f:
+                    tags = exifread.process_file(f)
+                    
+                    # Campos de fecha en orden de preferencia
+                    date_fields = [
+                        'EXIF DateTimeOriginal',
+                        'EXIF DateTimeDigitized', 
+                        'EXIF DateTime',
+                        'Image DateTime'
+                    ]
+                    
+                    for field in date_fields:
+                        if field in tags:
                             try:
-                                metadata['date_taken'] = datetime.strptime(value, '%Y:%m:%d %H:%M:%S').date()
-                            except:
-                                pass
-                
-                # Descripción basada en nombre del archivo
-                name_without_ext = image_file.stem
-                metadata['description'] = name_without_ext.replace('_', ' ').replace('-', ' ').title()
-                
-        except Exception as e:
-            self.stdout.write(f"  ⚠️  Error extrayendo metadatos: {str(e)}")
+                                date_str = str(tags[field])
+                                parsed_date = datetime.strptime(date_str, '%Y:%m:%d %H:%M:%S')
+                                metadata['date_taken'] = parsed_date.date()
+                                self.stdout.write(f"  📅 Fecha EXIF extraída: {metadata['date_taken']} ({field})")
+                                break
+                            except ValueError as e:
+                                self.stdout.write(f"  ⚠️  Error parseando {field}: {date_str}")
+                                continue
+                                
+            except Exception as e:
+                self.stdout.write(f"  ⚠️  Error con exifread: {str(e)}")
+        
+        # Si no se extrajo con exifread, intentar con PIL
+        if 'date_taken' not in metadata:
+            try:
+                with Image.open(image_file) as img:
+                    exif = img._getexif()
+                    if exif:
+                        # Buscar fecha de toma en diferentes campos EXIF
+                        date_fields = ['DateTimeOriginal', 'DateTimeDigitized', 'DateTime']
+                        for tag, value in exif.items():
+                            decoded = ExifTags.TAGS.get(tag, tag)
+                            if decoded in date_fields:
+                                try:
+                                    parsed_date = datetime.strptime(str(value), '%Y:%m:%d %H:%M:%S')
+                                    metadata['date_taken'] = parsed_date.date()
+                                    self.stdout.write(f"  📅 Fecha PIL extraída: {metadata['date_taken']} ({decoded})")
+                                    break
+                                except ValueError:
+                                    continue
+                                    
+            except Exception as e:
+                self.stdout.write(f"  ⚠️  Error con PIL EXIF: {str(e)}")
+        
+        # Como último recurso, usar fecha de modificación del archivo
+        if 'date_taken' not in metadata:
+            try:
+                file_stat = image_file.stat()
+                file_date = datetime.fromtimestamp(file_stat.st_mtime).date()
+                metadata['date_taken'] = file_date
+                self.stdout.write(f"  📅 Fecha de archivo: {metadata['date_taken']}")
+            except Exception as e:
+                self.stdout.write(f"  ⚠️  Error obteniendo fecha de archivo: {str(e)}")
         
         return metadata
 
@@ -338,7 +389,27 @@ class Command(BaseCommand):
         """Crea un archivo thumbnail"""
         try:
             with Image.open(source_path) as img:
+                # Convertir a RGB si es necesario (para JPEGs)
+                if img.mode in ('RGBA', 'LA'):
+                    # Crear fondo blanco para imágenes con transparencia
+                    background = Image.new('RGB', img.size, (255, 255, 255))
+                    if img.mode == 'RGBA':
+                        background.paste(img, mask=img.split()[-1])
+                    else:
+                        background.paste(img)
+                    img = background
+                elif img.mode not in ('RGB', 'L'):
+                    img = img.convert('RGB')
+                
+                # Crear thumbnail manteniendo proporción
                 img.thumbnail((300, 300), Image.Resampling.LANCZOS)
-                img.save(thumbnail_path, 'JPEG', quality=85)
+                
+                # Guardar como JPEG con buena calidad
+                img.save(thumbnail_path, 'JPEG', quality=85, optimize=True)
+                self.stdout.write(f"  📷 Thumbnail creado: {thumbnail_path.name}")
+                
         except Exception as e:
-            self.stdout.write(f"  ⚠️  Error creando thumbnail: {str(e)}") 
+            self.stdout.write(f"  ⚠️  Error creando thumbnail: {str(e)}")
+            return False
+        
+        return True 
