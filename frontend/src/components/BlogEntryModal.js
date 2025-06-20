@@ -25,10 +25,10 @@ const BlogEntryModal = ({ lugar, onClose }) => {
       } else {
         const range = fadeEnd - fadeStart;
         const progress = (scrollY - fadeStart) / range;
-        setHeroOpacity(1 - progress);
+      setHeroOpacity(1 - progress);
       }
     };
-
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -155,14 +155,14 @@ const BlogEntryModal = ({ lugar, onClose }) => {
       </nav>
 
       {/* HERO */}
-                      <section className="blog-hero" style={{ opacity: heroOpacity }}>
+      <section className="blog-hero" style={{ opacity: heroOpacity }}>
           <div className={getHeroOverlayClasses(lugar.blogEntry?.title || lugar.name)}>
             <h1 className={getTitleClasses(lugar.blogEntry?.title || lugar.name)}>{lugar.blogEntry?.title || lugar.name}</h1>
-           {lugar.blogEntry?.description && (
-             <p className="blog-description">
-               {lugar.blogEntry.description}
-             </p>
-           )}
+          {lugar.blogEntry?.description && (
+            <p className="blog-description">
+              {lugar.blogEntry.description}
+            </p>
+          )}
         </div>
         
         {/* Scroll indicator */}

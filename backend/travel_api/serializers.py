@@ -165,7 +165,7 @@ class EntradaDeBlogSerializer(serializers.ModelSerializer):
     def get_extracto(self, obj):
         """Genera un extracto del contenido"""
         from .utils import extract_excerpt
-        return extract_excerpt(obj.contenido_markdown, max_length=150)
+        return extract_excerpt(obj.contenido_markdown, max_length=150) 
     
     def get_fecha_display(self, obj):
         """Retorna la fecha formateada según la configuración"""

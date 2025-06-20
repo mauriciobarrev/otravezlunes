@@ -190,3 +190,112 @@ try:
 except ImportError:
     # django-csp no instalado, omitir sin romper la app
     pass
+
+# Opcional: Enviar backup a almacenamiento en la nube
+# Descomenta las siguientes líneas si usas rsync o aws s3
+# rsync -avz $BACKUP_DIR/ usuario@servidor-backup:/ruta/backups/
+# aws s3 sync $BACKUP_DIR/ s3://mi-bucket-backup/blog-backups/
+
+# ==================== CONFIGURACIONES ADICIONALES PARA PRODUCCIÓN ====================
+
+# Configuración de archivos estáticos para producción
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# WhiteNoise para servir archivos estáticos
+if not DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    
+    # Añadir WhiteNoise al middleware si no está ya
+    if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
+        # Insertar después de SecurityMiddleware
+        sec_index = MIDDLEWARE.index('django.middleware.security.SecurityMiddleware')
+        MIDDLEWARE.insert(sec_index + 1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+
+# Configuración de logging para producción
+if not DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'verbose': {
+                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+                'style': '{',
+            },
+            'simple': {
+                'format': '{levelname} {message}',
+                'style': '{',
+            },
+        },
+        'handlers': {
+            'file': {
+                'level': 'ERROR',
+                'class': 'logging.FileHandler',
+                'filename': '/var/log/blog_errors.log',
+                'formatter': 'verbose',
+            },
+            'console': {
+                'level': 'INFO',
+                'class': 'logging.StreamHandler',
+                'formatter': 'simple',
+            },
+        },
+        'root': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+    }
+
+# Configuración de cache para producción (opcional)
+if not DEBUG:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
+    }
+
+# Configuraciones adicionales de seguridad para producción
+if not DEBUG:
+    # Forzar HTTPS
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    USE_TLS = True
+    
+    # Configuraciones de cookies seguras
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+    
+    # Headers de seguridad adicionales
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Configuración específica para archivos media en producción
+if not DEBUG:
+    # Configuración para servir archivos media con nginx
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')
+
+# Configuración de timezone para Colombia (opcional)
+TIME_ZONE = 'America/Bogota'
+USE_TZ = True
+
+# Configuración de idioma en español (opcional)
+LANGUAGE_CODE = 'es-CO'
+
+# Configuración REST Framework para producción
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Cambiar según necesidades
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20
+}
+
+# En producción, desactivar browsable API
+if not DEBUG:
+    REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] = [
+        'rest_framework.renderers.JSONRenderer',
+    ]

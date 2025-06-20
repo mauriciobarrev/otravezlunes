@@ -11,7 +11,7 @@ const HomePage = () => {
       if (lugar.blogEntry.slug) {
         navigate(`/blog/${lugar.blogEntry.slug}`);
       } else if (lugar.blogEntry.id) {
-        navigate(`/p/${lugar.blogEntry.id}`);
+      navigate(`/p/${lugar.blogEntry.id}`);
       }
     } else {
       // Si no hay entrada de blog, no hacer nada

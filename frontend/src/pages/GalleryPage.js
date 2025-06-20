@@ -41,8 +41,8 @@ const GalleryPage = () => {
         } else if (entradaId) {
           // Usar la URL antigua con ID (para compatibilidad)
           endpoint = initialFotoId
-            ? `/api/entrada-blog-galeria/${entradaId}/${initialFotoId}/`
-            : `/api/entrada-blog-galeria/${entradaId}/`;
+          ? `/api/entrada-blog-galeria/${entradaId}/${initialFotoId}/`
+          : `/api/entrada-blog-galeria/${entradaId}/`;        
         } else {
           throw new Error('No se proporcionó ni slug ni ID de entrada');
         }

@@ -13,3 +13,14 @@ pymdown-extensions>=10.0
 
 # Seguridad adicional
 django-csp>=3.7
+
+# Dependencias para Producción
+gunicorn>=21.0.0
+whitenoise>=6.5.0
+dj-database-url>=2.0.0
+python-decouple>=3.8
+django-cors-headers>=4.0.0
+django-environ>=0.10.0
+
+# Para lectura de EXIF
+exifread>=3.0.0
