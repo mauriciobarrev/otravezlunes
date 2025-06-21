@@ -33,28 +33,21 @@ const BlogEntryModal = ({ lugar, onClose }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Función para detectar títulos muy largos que necesitan ajustes especiales
+  // Detect very long titles (e.g., Tayrona) to tweak max-width & font-size via CSS
   const isVeryLongTitle = (title) => {
     if (!title) return false;
-    // Solo para títulos realmente largos (más de 45 caracteres)
-    // Como "PARQUE NACIONAL NATURAL TAYRONA: EL PARAÍSO EN LA TIERRA" (54 chars)
-    return title.length > 45;
+    return title.length > 45; // threshold tuned for current design
   };
 
-  // Función para obtener clases CSS apropiadas
   const getHeroOverlayClasses = (title) => {
     let classes = 'hero-overlay';
-    if (isVeryLongTitle(title)) {
-      classes += ' hero-overlay-long-title';
-    }
+    if (isVeryLongTitle(title)) classes += ' hero-overlay-long-title';
     return classes;
   };
 
   const getTitleClasses = (title) => {
     let classes = 'blog-title';
-    if (isVeryLongTitle(title)) {
-      classes += ' blog-title-very-long';
-    }
+    if (isVeryLongTitle(title)) classes += ' blog-title-very-long';
     return classes;
   };
 
@@ -149,6 +142,34 @@ const BlogEntryModal = ({ lugar, onClose }) => {
     <div className="modal-backdrop">
       {/* Top Navigation */}
       <nav className="top-navigation">
+        <div style={{
+          position: 'absolute',
+          left: '15px',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          width: '200px',
+          height: '60px',
+          display: 'flex',
+          alignItems: 'center',
+          backgroundColor: 'transparent',
+          pointerEvents: 'none'
+        }}>
+          <img 
+            src="/logo.svg"
+            alt="LUNES Logo"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              objectPosition: 'left center',
+              pointerEvents: 'none'
+            }}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = window.location.origin + '/logo.svg';
+            }}
+          />
+        </div>
         <button className="nav-button" onClick={onClose}>
           Mapa
         </button>

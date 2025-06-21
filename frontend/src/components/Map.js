@@ -469,19 +469,56 @@ function Map({ onMarkerClick }) {
 
   return (
     <div className="map-wrapper">
+      {/* Mapa */}
+      <div 
+        ref={mapContainerRef} 
+        className="map-container"
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+          top: 0,
+          left: 0
+        }}
+      />
+      
+      {/* Logo */}
+      <div style={{
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
+        left: 'auto',
+        zIndex: 1000,
+        backgroundColor: 'transparent',
+        pointerEvents: 'none',
+        maxWidth: '180px',
+        maxHeight: '50px'
+      }}>
+        <img 
+          src="/logo.svg"
+          alt="LUNES Logo"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            objectPosition: 'right center'
+          }}
+          onError={(e) => {
+            console.error('Error loading logo');
+            e.target.onerror = null;
+            e.target.src = window.location.origin + '/logo.svg';
+          }}
+        />
+      </div>
+      
       {error && (
         <div className="error-message">
           Error: {error}
         </div>
       )}
       
-      {isLoading ? (
+      {isLoading && (
         <div className="loading">Cargando mapa...</div>
-      ) : (
-        <div 
-          ref={mapContainerRef} 
-          className="map-container"
-        />
       )}
     </div>
   );
