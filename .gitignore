@@ -48,6 +48,12 @@ db.sqlite3
 .env.test.local
 .env.production.local
 
+# Archivos grandes
+*.tar.gz
+*.zip
+*.sql
+*.sqlite3
+
 # Archivos de IDE
 .idea/
 .vscode/
