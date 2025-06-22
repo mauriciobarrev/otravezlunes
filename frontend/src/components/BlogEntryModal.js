@@ -99,8 +99,6 @@ const BlogEntryModal = ({ lugar, onClose }) => {
     return `${window.location.protocol}//${window.location.host}${url}`;
   };
 
-  const firstPhoto = lugar.photos[0];
-
   // Función para formatear fechas inteligentemente
   const formatDisplayDate = (dateString, showOnlyMonthYear = false) => {
     if (!dateString) return '';

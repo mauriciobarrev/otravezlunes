@@ -1,8 +1,15 @@
 .map-wrapper {
   position: relative;
   width: 100%;
-  height: 100vh;
+  /* Usar altura dinámica para iOS */
+  height: var(--app-height, 100vh);
   overflow: hidden;
+  /* Soporte para safe area en iOS */
+  padding-top: var(--safe-area-inset-top, 0px);
+  padding-bottom: var(--safe-area-inset-bottom, 0px);
+  padding-left: var(--safe-area-inset-left, 0px);
+  padding-right: var(--safe-area-inset-right, 0px);
+  box-sizing: border-box;
 }
 
 /* Contenedor del mapa */
@@ -12,6 +19,9 @@
   left: 0;
   width: 100%;
   height: 100%;
+  /* Ajustar para safe area en dispositivos iOS */
+  bottom: var(--safe-area-inset-bottom, 0px);
+  right: var(--safe-area-inset-right, 0px);
 }
 
 /* Estilos para el logo en móviles */
@@ -26,8 +36,8 @@
 
 .map-logo {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: calc(20px + var(--safe-area-inset-top, 0px));
+  left: calc(20px + var(--safe-area-inset-left, 0px));
   z-index: 1000;
   pointer-events: none;
 }
@@ -151,6 +161,9 @@
 /* Estilos personalizados para los controles de Mapbox */
 .mapboxgl-ctrl-bottom-right {
   margin: 0 20px 20px 0;
+  /* Ajustar para safe area en iOS */
+  margin-bottom: calc(20px + var(--safe-area-inset-bottom, 0px));
+  margin-right: calc(20px + var(--safe-area-inset-right, 0px));
 }
 
 .mapboxgl-ctrl-group {
@@ -243,6 +256,9 @@
 @media (max-width: 768px) {
   .mapboxgl-ctrl-bottom-right {
     margin: 0 15px 15px 0;
+    /* Ajustar márgenes para safe area en dispositivos móviles */
+    margin-bottom: calc(15px + var(--safe-area-inset-bottom, 0px));
+    margin-right: calc(15px + var(--safe-area-inset-right, 0px));
   }
   
   .mapboxgl-ctrl-zoom-in,
@@ -259,5 +275,11 @@
   
   .mapboxgl-ctrl-geolocate::before {
     font-size: 16px;
+  }
+
+  /* Ajustes específicos para el logo en móviles */
+  .map-logo {
+    top: calc(10px + var(--safe-area-inset-top, 0px)) !important;
+    left: calc(10px + var(--safe-area-inset-left, 0px)) !important;
   }
 } 

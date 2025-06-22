@@ -1,4 +1,26 @@
 /* Estilos base mínimos para App */
+/* Soporte para iOS Safe Area y viewport dinámico */
+:root {
+  /* Variables CSS para manejar safe area en iOS */
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  
+  /* Altura de viewport dinámico para iOS */
+  --vh: 1vh;
+  --app-height: calc(var(--vh, 1vh) * 100);
+}
+
+/* Script para calcular vh real en iOS Safari */
+html {
+  height: 100%;
+  /* Prevenir zoom en iOS */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -11,18 +33,30 @@ body {
   color: white;
   height: 100%;
   overflow: hidden;
-}
-
-html {
-  height: 100%;
+  /* Prevenir scroll bounce en iOS */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+  /* Soporte para safe area */
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+  padding-left: var(--safe-area-inset-left);
+  padding-right: var(--safe-area-inset-right);
 }
 
 .App {
   text-align: center;
-  height: 100vh;
+  /* Usar altura dinámica para iOS */
+  height: var(--app-height);
   width: 100vw;
   overflow: hidden;
   position: relative;
+  /* Prevenir selección de texto en iOS */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .App-logo {

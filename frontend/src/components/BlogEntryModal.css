@@ -14,6 +14,11 @@
   z-index: 1000;
   height: 70px;
   box-sizing: border-box;
+  /* Ajustar para safe area en iOS */
+  padding-top: calc(15px + var(--safe-area-inset-top, 0px));
+  padding-left: calc(20px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(20px + var(--safe-area-inset-right, 0px));
+  min-height: calc(70px + var(--safe-area-inset-top, 0px));
 }
 
 /* Estilos para el logo en la navegación */
@@ -102,10 +107,18 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 0;
   overflow-x: hidden; /* por defecto ocultamos scroll horizontal */
+  /* Prevenir zoom en iOS Safari */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   overscroll-behavior: none;
+  /* Prevenir scroll bounce en iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Altura dinámica para iOS */
+  min-height: var(--app-height, 100vh);
 }
 
 /* Hide scrollbar but keep functionality */
@@ -159,7 +172,8 @@ html {
 .blog-hero {
   position: relative;
   width: 100%;
-  height: 100vh;
+  /* Usar altura dinámica para iOS */
+  height: var(--app-height, 100vh);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -168,6 +182,10 @@ html {
   background: #0d0d0d;
   transition: opacity 0.5s ease;
   z-index: 2;
+  /* Ajustar para safe area en iOS */
+  padding-top: var(--safe-area-inset-top, 0px);
+  padding-bottom: var(--safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
 }
 
 .hero-overlay {
@@ -177,7 +195,8 @@ html {
   flex-direction: column;
   align-items: center;
   max-width: 900px;
-  margin-top: 80px;
+  /* Ajustar margen superior para iOS safe area */
+  margin-top: calc(80px + var(--safe-area-inset-top, 0px));
 }
 
 .blog-title {

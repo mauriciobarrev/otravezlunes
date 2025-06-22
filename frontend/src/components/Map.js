@@ -1,13 +1,15 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import './Map.css';
 
-// El token de Mapbox ahora se obtiene desde variables de entorno para evitar exponerlo en el repositorio.
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN || '';
+// Configurar token de Mapbox desde variables de entorno
+const mapboxToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
-if (!mapboxgl.accessToken) {
-  // Token no definido - el mapa podría no funcionar correctamente
-  // En desarrollo se puede verificar en las variables de entorno
+if (!mapboxToken) {
+  console.error('Mapbox token no encontrado en variables de entorno');
+} else {
+  // Limpiar el token de posibles saltos de línea
+  mapboxgl.accessToken = mapboxToken.replace(/\n|\r/g, '').trim();
 }
 
 // Datos de ejemplo para usar en caso de fallo
@@ -62,7 +64,7 @@ function Map({ onMarkerClick }) {
   const [places, setPlaces] = useState([]);
 
   // Función para guardar el estado del mapa
-  const saveMapState = (newLng, newLat, newZoom) => {
+  const saveMapState = useCallback((newLng, newLat, newZoom) => {
     try {
       const mapState = {
         lng: newLng,
@@ -74,10 +76,10 @@ function Map({ onMarkerClick }) {
     } catch (error) {
       console.warn('Error saving map state:', error);
     }
-  };
+  }, []);
 
   // Función para calcular bounds que incluyan todos los marcadores
-  const fitBoundsToMarkers = (mapInstance, placesData) => {
+  const fitBoundsToMarkers = useCallback((mapInstance, placesData) => {
     if (!mapInstance || !placesData || placesData.length === 0) return;
 
     try {
@@ -121,7 +123,7 @@ function Map({ onMarkerClick }) {
     } catch (error) {
       console.warn('Error fitting bounds to markers:', error);
     }
-  };
+  }, [setHasInitialFit, saveMapState]);
 
   // Efecto para cargar los datos de la API
   useEffect(() => {
@@ -228,7 +230,7 @@ function Map({ onMarkerClick }) {
         map.remove();
       }
     };
-  }, [isLoading, lng, lat, zoom, map]);
+  }, [isLoading, lng, lat, zoom, map, saveMapState]);
 
   // Efecto para añadir marcadores cuando el mapa está listo
   useEffect(() => {
@@ -435,7 +437,7 @@ function Map({ onMarkerClick }) {
       fitBoundsToMarkers(map, places);
     }
     
-  }, [map, places, onMarkerClick, hasInitialFit]);
+  }, [map, places, onMarkerClick, hasInitialFit, fitBoundsToMarkers]);
 
   // Función para procesar URLs de imágenes
   function processImageUrl(url) {
